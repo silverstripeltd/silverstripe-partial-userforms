@@ -3,6 +3,7 @@ const submitURL = 'partialuserform/save';
 const form = document.body.querySelector('form.userform');
 const formElements = () => Array.from(form.querySelectorAll('[name]:not([type=hidden]):not([type=submit])'));
 const saveButton = form.querySelector('button.step-button-save');
+const nextButton = form.querySelector('button.step-button-next');
 const submitButton = form.querySelector('[type=submit]');
 const requests = [];
 
@@ -83,6 +84,7 @@ const submitPartial = () => {
 
 const attachSavePartial = () => {
   saveButton.addEventListener('click', submitPartial);
+  nextButton.addEventListener('click', submitPartial);
 };
 
 const abortPendingSubmissions = () => {
