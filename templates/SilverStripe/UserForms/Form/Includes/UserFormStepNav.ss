@@ -12,12 +12,20 @@
         <% if $Controller.EnablePartialSubmissions %>
             <li class="step-button-wrapper">
                 <button class="step-button-save" type="button">
-                    <%t Firesphere\\PartialUserforms\\Form.STEP_SAVE "Save" %>
+                    <% if $Controller.SaveOnlyLabel %>
+	                    $Controller.SaveOnlyLabel
+                    <% else %>
+                        <%t Firesphere\\PartialUserforms\\Form.STEP_SAVE "Save" %>
+                    <% end_if %>
                 </button>
             </li>
             <li class="step-button-wrapper">
                 <a href="{$Controller.Link}overview" class="step-button-share">
-                    <%t Firesphere\\PartialUserforms\\Form.STEP_SHARE "Share form" %>
+                    <% if $Controller.SaveAndLogoutLabel %>
+                        $Controller.SaveAndLogoutLabel
+                    <% else %>
+                        <%t Firesphere\\PartialUserforms\\Form.STEP_SHARE "Share form" %>
+                    <% end_if %>
                 </a>
             </li>
         <% end_if %>
@@ -37,3 +45,6 @@
 
     </ul>
 </nav>
+<% if $Controller.ShareLink %>
+    <p>Share: <a href="$Controller.ShareLink" target="_blank">$Controller.ShareLink</a></p>
+<% end_if %>

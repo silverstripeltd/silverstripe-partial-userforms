@@ -3,6 +3,7 @@
 namespace Firesphere\PartialUserforms\Extensions;
 
 use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataList;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
@@ -34,6 +35,8 @@ class UserDefinedFormExtension extends DataExtension
         'PasswordProtected'        => 'Boolean(false)',
         'FormIntroduction'         => 'Text',
         'FormOverview'             => 'Text',
+        'SaveOnlyLabel'            => 'Varchar(50)',
+        'SaveAndLogoutLabel'       => 'Varchar(50)',
     ];
 
     /**
@@ -115,6 +118,8 @@ class UserDefinedFormExtension extends DataExtension
             TextareaField::create('FormOverview', 'Form overview text')
                 ->setDescription($overviewTextDescription)
                 ->setRows(3),
+            TextField::create('SaveOnlyLabel', 'Save only Label'),
+            TextField::create('SaveAndLogoutLabel', 'Save and logout Label'),
         ]);
     }
 }

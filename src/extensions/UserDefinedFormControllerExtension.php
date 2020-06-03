@@ -254,4 +254,17 @@ class UserDefinedFormControllerExtension extends Extension
 
         return $this->owner->redirect($link);
     }
+
+    /**
+     * Share link from session
+     * Template helper @see UserFormStepNav.ss
+     * @return void|string URL
+     */
+    public function getShareLink()
+    {
+        $partialSubmission = $this->getPartialFormSubmission();
+        if ($partialSubmission) {
+            return $partialSubmission->getPartialLink();
+        }
+    }
 }
