@@ -234,7 +234,12 @@ class UserDefinedFormControllerExtension extends Extension
         }
 
         $actions = FieldList::create(
-            FormAction::create('goToForm')->setTitle('Go to form')
+            FormAction::create('goToForm')
+                ->setTitle('Go to form')
+                ->addExtraClass('primary'),
+            FormAction::create('goToLogout')
+                ->setTitle('Logout')
+                ->addExtraClass('log-out')
         );
 
         return Form::create(
@@ -253,6 +258,19 @@ class UserDefinedFormControllerExtension extends Extension
         $link = $data['FormLink'];
 
         return $this->owner->redirect($link);
+    }
+
+    /**
+     * Clear session and go to start page
+     */
+    public function goToLogout($data, $form)
+    {
+        $request = $this->owner->getRequest();
+        $session = $request->getSession();
+        $session->clear(PartialSubmissionController::SESSION_KEY);
+        $session->clear(PasswordForm::PASSWORD_SESSION_KEY);
+        $session->clear(PartialUserFormVerifyController::PASSWORD_KEY);
+        return $this->owner->redirect($this->owner->Link('start'));
     }
 
     /**

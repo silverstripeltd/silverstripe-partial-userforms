@@ -45,6 +45,3 @@
 
     </ul>
 </nav>
-<% if $Controller.ShareLink %>
-    <p>Share: <a href="$Controller.ShareLink" target="_blank">$Controller.ShareLink</a></p>
-<% end_if %>
