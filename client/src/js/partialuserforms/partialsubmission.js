@@ -1,11 +1,12 @@
 const baseDomain = document.baseURI;
 const submitURL = 'partialuserform/save';
 const form = document.body.querySelector('form.userform');
-const formElements = () => Array.from(form.querySelectorAll('[name]:not([type=hidden]):not([type=submit])'));
+const formElements = () => Array.from(form.querySelectorAll('[name]:not([type=submit])'));
 const saveButton = form.querySelector('button.step-button-save');
 const nextButton = form.querySelector('button.step-button-next');
 const shareButton = form.querySelector('a.step-button-share');
 const submitButton = form.querySelector('[type=submit]');
+const repeatButton = form.querySelector('button.btn-add-more');
 const requests = [];
 
 const getElementValue = (element, fieldName) => {
@@ -83,10 +84,67 @@ const submitPartial = () => {
   httpRequest.send(data);
 };
 
+const replaceExistingAttribute = (dom, attr, previous, latest) => {
+  var matches = dom.querySelectorAll(`[${attr}*=${previous}`);
+  matches.forEach( function (item) {
+    var oldValue = item.getAttribute(attr);
+    var newValue = oldValue.replace(new RegExp(previous), latest);
+    item.setAttribute(attr, newValue);
+  });
+};
+
+const duplicateFields = (event) => {
+  event.preventDefault();
+  const button = event.target;
+  const buttonContainer = button.parentNode;
+  const mainContainer = buttonContainer.parentNode;
+  const source = mainContainer.querySelector('.repeat-source');
+  const destination = mainContainer.querySelector('.repeat-destination');
+  let data = JSON.parse(button.getAttribute('data'));
+
+  Object.keys(data).forEach(function (index) {
+    var fieldName = index + '__' + (data[index].length + 1);
+    var newField = source.querySelector('#' + index).cloneNode(true);
+    newField.setAttribute('id', fieldName);
+
+    replaceExistingAttribute(newField, 'id', index, fieldName);
+    replaceExistingAttribute(newField, 'name', index, fieldName);
+    replaceExistingAttribute(newField, 'for', index, fieldName);
+
+    // var matchedIds = newField.querySelectorAll('[id*=' + index);
+    // matchedIds.forEach( function (item) {
+    //   var oldId = item.getAttribute('id');
+    //   var newId = oldId.replace(new RegExp(index), fieldName);
+    //   item.setAttribute('id', newId);
+    // });
+    //
+    // var matchedFors = newField.querySelectorAll('[for*=' + index);
+    // matchedFors.forEach( function (item) {
+    //   var oldFor = item.getAttribute('for');
+    //   var newFor = oldFor.replace(new RegExp(index), fieldName);
+    //   item.setAttribute('for', newFor);
+    // });
+    //
+    // var matchedName = newField.querySelectorAll('[name*=' + index);
+    // matchedName.forEach( function (item) {
+    //   var oldName = item.getAttribute('name');
+    //   var newName = oldName.replace(new RegExp(index), fieldName);
+    //   item.setAttribute('name', newName);
+    // });
+
+    destination.append(newField);
+    data[index].push(fieldName);
+    button.setAttribute('data', JSON.stringify(data));
+    var buttonInput = buttonContainer.querySelector('input[type=hidden]');
+    buttonInput.setAttribute('value', JSON.stringify(data));
+  });
+};
+
 const attachSavePartial = () => {
   saveButton.addEventListener('click', submitPartial);
   nextButton.addEventListener('click', submitPartial);
   shareButton.addEventListener('click', submitPartial);
+  repeatButton.addEventListener('click', duplicateFields);
 };
 
 const abortPendingSubmissions = () => {
