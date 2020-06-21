@@ -101,6 +101,10 @@ const duplicateFields = (event) => {
   const source = mainContainer.querySelector('.repeat-source');
   const destination = mainContainer.querySelector('.repeat-destination');
   let data = JSON.parse(button.getAttribute('data'));
+  if (!data) {
+    console.log('RepeatField requires linking editable fields');
+    return;
+  }
 
   Object.keys(data).forEach(function (index) {
     var fieldName = index + '__' + (data[index].length + 1);
@@ -110,27 +114,6 @@ const duplicateFields = (event) => {
     replaceExistingAttribute(newField, 'id', index, fieldName);
     replaceExistingAttribute(newField, 'name', index, fieldName);
     replaceExistingAttribute(newField, 'for', index, fieldName);
-
-    // var matchedIds = newField.querySelectorAll('[id*=' + index);
-    // matchedIds.forEach( function (item) {
-    //   var oldId = item.getAttribute('id');
-    //   var newId = oldId.replace(new RegExp(index), fieldName);
-    //   item.setAttribute('id', newId);
-    // });
-    //
-    // var matchedFors = newField.querySelectorAll('[for*=' + index);
-    // matchedFors.forEach( function (item) {
-    //   var oldFor = item.getAttribute('for');
-    //   var newFor = oldFor.replace(new RegExp(index), fieldName);
-    //   item.setAttribute('for', newFor);
-    // });
-    //
-    // var matchedName = newField.querySelectorAll('[name*=' + index);
-    // matchedName.forEach( function (item) {
-    //   var oldName = item.getAttribute('name');
-    //   var newName = oldName.replace(new RegExp(index), fieldName);
-    //   item.setAttribute('name', newName);
-    // });
 
     destination.append(newField);
     data[index].push(fieldName);

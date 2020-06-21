@@ -172,7 +172,11 @@ class PartialSubmissionController extends ContentController
         ];
 
         /** @var EditableFormField $editableField */
-        $editableField = EditableFormField::get()->filter(['Name' => $formData['Name']])->first();
+        $editableField = EditableFormField::get()->find('Name', $formData['Name']);
+        if (is_null($editableField)) {
+            $nameParts = explode('__', $formData['Name']);
+            $editableField = EditableFormField::get()->find('Name', reset($nameParts));
+        }
         if ($editableField instanceof EditableFormField\EditableFileField) {
             $this->savePartialFile($formData, $filter, $editableField);
         } elseif ($editableField instanceof EditableFormField) {
