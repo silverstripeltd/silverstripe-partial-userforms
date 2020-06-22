@@ -95,39 +95,48 @@ const replaceExistingAttribute = (dom, attr, previous, latest) => {
 
 const duplicateFields = (event) => {
   event.preventDefault();
-  const button = event.target;
-  const buttonContainer = button.parentNode;
+  const repeatButton = event.target;
+  const hiddenInput = repeatButton.parentNode.querySelector('input[type=hidden]');
+  hiddenInput.value = parseInt(hiddenInput.value) + 1;
+  toggleRepeatedFields(repeatButton);
+};
+
+const toggleRepeatedFields = (repeatButton) => {
+  const buttonContainer = repeatButton.parentNode;
   const mainContainer = buttonContainer.parentNode;
-  const source = mainContainer.querySelector('.repeat-source');
   const destination = mainContainer.querySelector('.repeat-destination');
-  let data = JSON.parse(button.getAttribute('data'));
-  if (!data) {
-    console.log('RepeatField requires linking editable fields');
-    return;
-  }
-
-  Object.keys(data).forEach(function (index) {
-    var fieldName = index + '__' + (data[index].length + 1);
-    var newField = source.querySelector('#' + index).cloneNode(true);
-    newField.setAttribute('id', fieldName);
-
-    replaceExistingAttribute(newField, 'id', index, fieldName);
-    replaceExistingAttribute(newField, 'name', index, fieldName);
-    replaceExistingAttribute(newField, 'for', index, fieldName);
-
-    destination.append(newField);
-    data[index].push(fieldName);
-    button.setAttribute('data', JSON.stringify(data));
-    var buttonInput = buttonContainer.querySelector('input[type=hidden]');
-    buttonInput.setAttribute('value', JSON.stringify(data));
+  const hiddenInput = buttonContainer.querySelector('input[type=hidden]');
+  const hiddenData = JSON.parse(repeatButton.getAttribute('data'));
+  Object.keys(hiddenData).forEach(function (index) {
+    for (var i = 1; i <= parseInt(hiddenData[index]); i++) {
+      var fieldName = '#' + index + '__' + i;
+      var clonedField = destination.querySelector(fieldName);
+      if (i <= parseInt(hiddenInput.value)) {
+        clonedField.style.display = 'block';
+      } else {
+        clonedField.style.display = 'none';
+      }
+      if (parseInt(hiddenInput.value) >= parseInt(hiddenData[index])) {
+        buttonContainer.style.display = 'none';
+      }
+    }
   });
 };
 
 const attachSavePartial = () => {
-  saveButton.addEventListener('click', submitPartial);
-  nextButton.addEventListener('click', submitPartial);
-  shareButton.addEventListener('click', submitPartial);
-  repeatButton.addEventListener('click', duplicateFields);
+  if (saveButton) {
+    saveButton.addEventListener('click', submitPartial);
+  }
+  if (nextButton) {
+    nextButton.addEventListener('click', submitPartial);
+  }
+  if (shareButton) {
+    shareButton.addEventListener('click', submitPartial);
+  }
+  if (repeatButton) {
+    repeatButton.addEventListener('click', duplicateFields);
+    toggleRepeatedFields(repeatButton);
+  }
 };
 
 const abortPendingSubmissions = () => {

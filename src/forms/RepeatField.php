@@ -4,28 +4,27 @@ namespace Firesphere\PartialUserforms\Forms;
 
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormField;
 
 class RepeatField extends CompositeField
 {
-    /**
-     * @var FieldList
-     */
-    protected $children;
-
-    public function __construct($name, $title = null, $value = '')
+    public function __construct($name, $title = null, $value = 1)
     {
         parent::__construct(new FieldList());
+        $this->defautFields = new FieldList();
 
         $this->setName($name);
+        $this->setValue($value);
 
         if ($title === null) {
             $this->title = self::name_to_label($name);
         } else {
             $this->title = $title;
         }
+    }
 
-        if ($value !== null) {
-            $this->setValue($value);
-        }
+    public function hasData()
+    {
+        return true;
     }
 }

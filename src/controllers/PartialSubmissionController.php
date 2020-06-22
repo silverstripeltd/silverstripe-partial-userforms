@@ -201,7 +201,6 @@ class PartialSubmissionController extends ContentController
         }
         if ($editableField) {
             $formData['Title'] = $editableField->Title;
-            $formData['ParentClass'] = $editableField->Parent()->ClassName;
         }
         if (!$partialSubmission) {
             $partialSubmission = PartialFieldSubmission::create($formData);
@@ -226,7 +225,6 @@ class PartialSubmissionController extends ContentController
                 'Name'            => $formData['Name'],
                 'SubmittedFormID' => $formData['SubmittedFormID'],
                 'Title'           => $editableField->Title,
-                'ParentClass'     => $editableField->Parent()->ClassName
             ];
             $partialFileSubmission = PartialFileFieldSubmission::create($partialData);
             $partialFileSubmission->write();
