@@ -92,7 +92,7 @@ const duplicateFields = (event) => {
   event.preventDefault();
   const repeatButton = event.target;
   const hiddenInput = repeatButton.parentNode.querySelector('input[type=hidden]');
-  hiddenInput.value = parseInt(hiddenInput.value) + 1;
+  hiddenInput.value = hiddenInput.value ? parseInt(hiddenInput.value) + 1 : 1;
   toggleRepeatedFields(repeatButton);
 };
 
