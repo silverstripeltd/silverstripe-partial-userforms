@@ -36,6 +36,7 @@ class PartialSubmissionController extends ContentController
      */
     private static $url_handlers = [
         'save' => 'savePartialSubmission',
+        'remove-file' => 'removeUploadedFile',
     ];
 
     /**
@@ -43,6 +44,7 @@ class PartialSubmissionController extends ContentController
      */
     private static $allowed_actions = [
         'savePartialSubmission',
+        'removeUploadedFile',
     ];
 
     /**
@@ -53,42 +55,16 @@ class PartialSubmissionController extends ContentController
      */
     public function savePartialSubmission(HTTPRequest $request)
     {
-        if (!$request->isPOST()) {
-            return $this->httpError(404);
-        }
-
         $postVars = $request->postVars();
-        $editableField = null;
 
         // We don't want SecurityID and/or the process Action stored as a thing
         unset($postVars['SecurityID'], $postVars['action_process']);
 
-        // Check for partial params so the submission doesn't rely on session for partial page
-        if (!empty($postVars['PartialID'])) {
-            $submissionID = $postVars['PartialID'];
-        } else {
-            $submissionID = $request->getSession()->get(self::SESSION_KEY);
-        }
-
         /** @var PartialFormSubmission $partialSubmission */
-        $partialSubmission = PartialFormSubmission::get()->byID($submissionID);
+        $partialSubmission = $this->checkFormSession($request);
+        $submissionID = $request->getSession()->get(self::SESSION_KEY);
 
-        if (!$submissionID || !$partialSubmission) {
-            // New sessions are created when a user clicks "Start" from the start form
-            // {@link UserDefinedFormControllerExtension::StartForm()}
-            $this->httpError(404);
-        }
-
-        // Check if form is locked
-        if (PartialUserFormController::isLockedOut()) {
-            $this->httpError(409,
-                'Your session has timed out and this form is currently being used by someone else. Please try again later.'
-            );
-        } else {
-            // Claim the form session
-            PartialSubmissionController::reloadSession($request->getSession(), $submissionID);
-        }
-
+        $editableField = null;
         foreach ($postVars as $field => $value) {
             /** @var EditableFormField $editableField */
             $editableField = $this->createOrUpdateSubmission([
@@ -112,6 +88,35 @@ class PartialSubmissionController extends ContentController
         $return = $partialSubmission->exists();
 
         return new HTTPResponse($return, ($return ? 201 : 400));
+    }
+
+    /**
+     * @param HTTPRequest $request
+     * @return HTTPResponse
+     * @throws ValidationException
+     * @throws HTTPResponse_Exception
+     */
+    public function removeUploadedFile(HTTPRequest $request)
+    {
+        $postVars = $request->postVars();
+        /** @var PartialFormSubmission $partialSubmission */
+        $partialSubmission = $this->checkFormSession($request);
+        $submissionID = $request->getSession()->get(self::SESSION_KEY);
+
+        $uploadedFile = File::create();
+        $partialUploads = $partialSubmission->PartialUploads();
+        $fileSubmission = $partialUploads->find('UploadedFileID', $postVars['fileID']);
+        if ($fileSubmission) {
+            $partialUploads->remove($fileSubmission);
+            $uploadedFile = $fileSubmission->UploadedFile();
+        }
+
+        if ($uploadedFile->exists()) {
+            $uploadedFile->deleteFile();
+            $uploadedFile->doArchive();
+        }
+
+        return new HTTPResponse(1, 200);
     }
 
     /**
@@ -141,6 +146,9 @@ class PartialSubmissionController extends ContentController
         $partial->PHPSessionID = $phpSessionID;
         $partial->write();
     }
+
+
+
 
     /**
      * Clear lock session (e.g. when the user navigates to form overview)
@@ -266,5 +274,51 @@ class PartialSubmissionController extends ContentController
         }
 
         return false;
+    }
+
+    /**
+     * @param HTTPRequest $request
+     * @return PartialFormSubmission
+     * @throws HTTPResponse_Exception
+     * @throws ValidationException
+     */
+    protected function checkFormSession(HTTPRequest $request)
+    {
+        $postVars = $request->postVars();
+
+        if (!$request->isPOST()) {
+            return $this->httpError(404);
+        }
+
+        // Check for partial params so the submission doesn't rely on session for partial page
+        if (empty($postVars['PartialID'])) {
+            return $this->httpError(404);
+        }
+
+        $submissionID = $request->getSession()->get(self::SESSION_KEY);
+        if (!$submissionID || (int) $postVars['PartialID'] !== (int) $submissionID) {
+            return $this->httpError(404);
+        }
+
+        // Check if form is locked
+        if (PartialUserFormController::isLockedOut()) {
+            return $this->httpError(409,
+                'Your session has timed out and this form is currently being used by someone else. Please try again later.'
+            );
+        } else {
+            // Claim the form session
+            PartialSubmissionController::reloadSession($request->getSession(), $submissionID);
+        }
+
+        /** @var PartialFormSubmission $partialSubmission */
+        $partialSubmission = PartialFormSubmission::get()->byID($submissionID);
+
+        if (!$partialSubmission) {
+            // New sessions are created when a user clicks "Start" from the start form
+            // {@link UserDefinedFormControllerExtension::StartForm()}
+            return $this->httpError(404);
+        }
+
+        return $partialSubmission;
     }
 }

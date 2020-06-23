@@ -7,6 +7,7 @@ const nextButton = form.querySelector('button.step-button-next');
 const shareButton = form.querySelector('a.step-button-share');
 const submitButton = form.querySelector('[type=submit]');
 const repeatButton = form.querySelector('button.btn-add-more');
+const removeFileButton = form.querySelectorAll('a.partial-file-remove');
 const requests = [];
 
 const getElementValue = (element, fieldName) => {
@@ -55,12 +56,6 @@ const submitPartial = () => {
       }
     }
   });
-
-  // Pass partial params if available
-  const partialID = form.querySelector('[name=PartialID]');
-  if (partialID) {
-    data.append('PartialID', partialID.value);
-  }
 
   /** global: XMLHttpRequest */
   const httpRequest = new XMLHttpRequest();
@@ -123,6 +118,41 @@ const toggleRepeatedFields = (repeatButton) => {
   });
 };
 
+const removePartialFile = (event) => {
+  event.preventDefault();
+
+  const link = event.target;
+  const form = new FormData();
+  const linkData = JSON.parse(link.getAttribute('data-file-remove'));
+  let disabled = link.getAttribute('data-disabled');
+  Object.keys(linkData).forEach(function (name) {
+    form.append(name, linkData[name]);
+  });
+
+  if (disabled === 'disabled') {
+    console.log('button disabled');
+    return;
+  }
+
+  link.setAttribute('data-disabled', 'disabled');
+
+  /** global: XMLHttpRequest */
+  const httpRequest = new XMLHttpRequest();
+  httpRequest.onreadystatechange = () => {
+    if (httpRequest.readyState === 4) {
+      if (httpRequest.status === 409) {
+        alert(httpRequest.responseText);
+      } else {
+        link.parentNode.innerHTML = '';
+      }
+    }
+  };
+
+  requests.push(httpRequest);
+  httpRequest.open('POST', `${baseDomain}partialuserform/remove-file`, true);
+  httpRequest.send(form);
+};
+
 const attachSavePartial = () => {
   if (saveButton) {
     saveButton.addEventListener('click', submitPartial);
@@ -136,6 +166,11 @@ const attachSavePartial = () => {
   if (repeatButton) {
     repeatButton.addEventListener('click', duplicateFields);
     toggleRepeatedFields(repeatButton);
+  }
+  if (removeFileButton.length) {
+    for (let index = 0; index < removeFileButton.length; index++) {
+      removeFileButton[index].addEventListener('click', removePartialFile);
+    }
   }
 };
 

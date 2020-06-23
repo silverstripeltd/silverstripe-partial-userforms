@@ -11,6 +11,7 @@ use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Control\Middleware\HTTPCacheControlMiddleware;
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\ORM\FieldType\DBField;
@@ -197,13 +198,18 @@ class PartialUserFormController extends UserDefinedFormController
         }
 
         foreach ($uploads as $upload) {
+            $file = $upload->UploadedFile();
+            $fileAttributes = ['PartialID' => $partial->ID, 'fileID' => $file->ID];
+            $linkTag = 'View <a href="%s" target="_blank">%s</a> &nbsp;
+                <a class="partial-file-remove" href="javascript:;" data-disabled="" data-file-remove=\'%s\'>Remove &cross;</a>';
+            $fileLink = sprintf(
+                $linkTag,
+                Convert::raw2att($file->AbsoluteLink()),
+                Convert::raw2att($file->Name),
+                Convert::raw2json($fileAttributes)
+            );
             $fields->dataFieldByName($upload->Name)
-                ->setRightTitle(
-                    sprintf(
-                        'Uploaded: %s (Attach a new file to replace the uploaded file)',
-                        $upload->UploadedFile()->Name
-                    )
-                )
+                ->setRightTitle(DBField::create_field('HTMLText', $fileLink))
                 ->removeExtraClass('requiredField')
                 ->setAttribute('data-rule-required', 'false')
                 ->setAttribute('aria-required', 'false');
