@@ -208,11 +208,13 @@ class PartialUserFormController extends UserDefinedFormController
                 Convert::raw2att($file->Name),
                 Convert::raw2json($fileAttributes)
             );
-            $fields->dataFieldByName($upload->Name)
-                ->setRightTitle(DBField::create_field('HTMLText', $fileLink))
-                ->removeExtraClass('requiredField')
-                ->setAttribute('data-rule-required', 'false')
-                ->setAttribute('aria-required', 'false');
+            $inputField = $fields->dataFieldByName($upload->Name);
+            if ($inputField) {
+                $inputField->setRightTitle(DBField::create_field('HTMLText', $fileLink))
+                    ->removeExtraClass('requiredField')
+                    ->setAttribute('data-rule-required', 'false')
+                    ->setAttribute('aria-required', 'false');
+            }
         }
     }
 }
