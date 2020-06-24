@@ -6,7 +6,7 @@ const saveButton = form.querySelector('button.step-button-save');
 const nextButton = form.querySelector('button.step-button-next');
 const shareButton = form.querySelector('a.step-button-share');
 const submitButton = form.querySelector('[type=submit]');
-const repeatButton = form.querySelector('button.btn-add-more');
+const repeatButton = form.querySelectorAll('button.btn-add-more');
 const removeFileButton = form.querySelectorAll('a.partial-file-remove');
 const requests = [];
 
@@ -163,9 +163,11 @@ const attachSavePartial = () => {
   if (shareButton) {
     shareButton.addEventListener('click', submitPartial);
   }
-  if (repeatButton) {
-    repeatButton.addEventListener('click', duplicateFields);
-    toggleRepeatedFields(repeatButton);
+  if (repeatButton.length) {
+    for (let index = 0; index < repeatButton.length; index++) {
+      repeatButton[index].addEventListener('click', duplicateFields);
+      toggleRepeatedFields(repeatButton[index]);
+    }
   }
   if (removeFileButton.length) {
     for (let index = 0; index < removeFileButton.length; index++) {
