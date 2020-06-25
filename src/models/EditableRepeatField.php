@@ -25,9 +25,13 @@ class EditableRepeatField extends EditableFormField
         'Maximum' => 1,
     ];
 
-    private static $many_many = array(
+    private static $many_many = [
         'Repeats' => EditableFormField::class
-    );
+    ];
+
+    private static $owns = [
+        'Repeats'
+    ];
 
     public function onBeforeWrite()
     {
