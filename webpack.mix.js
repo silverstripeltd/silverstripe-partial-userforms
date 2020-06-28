@@ -6,6 +6,7 @@ const destPath = `${themePath}/dist/`;
 
 const SRC = {
   js: jsPath + 'main.js',
+  repeatfield: jsPath + 'repeatfield.js'
 };
 
 const DEST = {
@@ -20,3 +21,4 @@ mix.options({
 });
 
 mix.js(SRC.js, DEST.js);
+mix.js(SRC.repeatfield, DEST.js);

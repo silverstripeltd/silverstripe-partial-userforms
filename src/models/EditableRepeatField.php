@@ -9,6 +9,7 @@ use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
 use SilverStripe\Forms\TextField;
 use SilverStripe\UserForms\Model\EditableFormField;
+use SilverStripe\View\Requirements;
 
 class EditableRepeatField extends EditableFormField
 {
@@ -18,11 +19,6 @@ class EditableRepeatField extends EditableFormField
 
     private static $db = [
         'Maximum' => 'Int',
-    ];
-
-    private static $defaults = [
-        'Default' => 1,
-        'Maximum' => 1,
     ];
 
     private static $many_many = [
@@ -37,10 +33,6 @@ class EditableRepeatField extends EditableFormField
     {
         parent::onBeforeWrite();
 
-        if (!$this->Default) {
-            $this->Default = 1;
-        }
-
         if (!$this->Maximum) {
             $this->Maximum = 1;
         }
@@ -48,6 +40,9 @@ class EditableRepeatField extends EditableFormField
 
     public function getFormField()
     {
+        // Add required javascripts
+        Requirements::javascript('firesphere/partialuserforms:client/dist/repeatfield.js');
+
         $field = RepeatField::create($this->Name, $this->Title ?: false)
             ->setRightTitle($this->RightTitle)
             ->setFieldHolderTemplate(self::class . '_holder')
@@ -86,7 +81,7 @@ class EditableRepeatField extends EditableFormField
 
         $fields->addFieldToTab(
             'Root.Main',
-            TextField::create('Maximum', 'Maximum repeats')
+            TextField::create('Maximum', 'Maximum repeats', $this->Maximum ?: 1)
         );
 
         $fields->addFieldToTab(
