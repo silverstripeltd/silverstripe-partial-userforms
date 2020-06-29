@@ -8,7 +8,7 @@ use SilverStripe\Forms\FormField;
 
 class RepeatField extends CompositeField
 {
-    public function __construct($name, $title = null, $value = 1)
+    public function __construct($name, $title = null, $value = 0)
     {
         parent::__construct(new FieldList());
         $this->defautFields = new FieldList();

@@ -3,12 +3,22 @@
 namespace Firesphere\PartialUserforms\Models;
 
 use Firesphere\PartialUserforms\Forms\RepeatField;
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Upload;
+use SilverStripe\Control\Controller;
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
 use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\FieldType\DBHTMLText;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\ORM\ValidationResult;
 use SilverStripe\UserForms\Model\EditableFormField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFileField;
 use SilverStripe\View\Requirements;
 
 class EditableRepeatField extends EditableFormField
@@ -38,6 +48,11 @@ class EditableRepeatField extends EditableFormField
         }
     }
 
+    public function getSubmittedFormField()
+    {
+        return SubmittedRepeatField::create();
+    }
+
     public function getFormField()
     {
         // Add required javascripts
@@ -56,11 +71,11 @@ class EditableRepeatField extends EditableFormField
             $fieldData[$childField->getName()] = $this->Maximum;
             $field->push($childField);
 
-            for ($i = 1; $i <= $this->Maximum; $i++) {
+            for ($index = 1; $index <= $this->Maximum; $index++) {
                 $clonedChild = clone $childField;
-                $childName = $childField->getName() . '__' . $i;
+                $childName = $childField->getName() . '__' . $index;
                 $clonedChild->setName($childName);
-                $duplicates[$i][] = $clonedChild;
+                $duplicates[$index][] = $clonedChild;
             }
         }
 
@@ -99,10 +114,47 @@ class EditableRepeatField extends EditableFormField
 
     public function getValueFromData($data)
     {
-        foreach ($this->Repeats() as $field) {
-            $field->toMap();
+        $maximum = $data[$this->Name] ? (int) $data[$this->Name]: 0;
+        $submissions = [];
+
+        for ($index = 0; $index <= $maximum; $index++) {
+            foreach ($this->Repeats() as $field) {
+                $fieldName = $index ? $field->Name . '__' . $index : $field->Name;
+                $field->Name = $fieldName;
+                $title = $field->getField('Title') ?: $fieldName;
+
+                if ($field->hasMethod('getValueFromData')) {
+                    $value = $field->getValueFromData($data);
+                } elseif (isset($data[$fieldName])) {
+                    $value = $data[$fieldName];
+                } else {
+                    $value = null;
+                }
+
+                if (!empty($data[$fieldName])) {
+                    if (in_array(EditableFileField::class, $field->getClassAncestry())) {
+                        if (!empty($_FILES[$fieldName]['name'])) {
+                            $foldername = $field->getFormField()->getFolderName();
+
+                            // create the file from post data
+                            $upload = Upload::create();
+                            $file = File::create();
+                            $file->ShowInSearch = 0;
+                            $upload->loadIntoFile($_FILES[$fieldName], $file, $foldername);
+                            $value = sprintf(
+                                '%s - <a href="%s" target="_blank">%s</a>',
+                                Convert::raw2att($file->Name),
+                                Convert::raw2att($file->AbsoluteLink()),
+                                $file->AbsoluteLink()
+                            );
+                        }
+                    }
+                }
+
+                $submissions[$index][$title] = $value;
+            }
         }
 
-        return 'hello';
+        return json_encode($submissions);
     }
 }
