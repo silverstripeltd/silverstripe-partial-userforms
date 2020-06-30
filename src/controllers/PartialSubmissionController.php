@@ -14,6 +14,7 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Control\Session;
+use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\ValidationException;
@@ -147,9 +148,6 @@ class PartialSubmissionController extends ContentController
         $partial->write();
     }
 
-
-
-
     /**
      * Clear lock session (e.g. when the user navigates to form overview)
      */
@@ -165,6 +163,36 @@ class PartialSubmissionController extends ContentController
         $partial->LockedOutUntil = null;
         $partial->PHPSessionID = null;
         $partial->write();
+    }
+
+    public static function getUploadLinks($partialID)
+    {
+        $partialFiles = [];
+        $session = Controller::curr()->getRequest()->getSession();
+        $submissionID = $session->get(PartialSubmissionController::SESSION_KEY);
+
+        if ($submissionID === intval($partialID)) {
+            $partial = PartialFormSubmission::get()->byID($submissionID);
+            $uploads = $partial->PartialUploads()->filter('UploadedFileID:not', 0);
+            foreach ($uploads as $partialUpload) {
+                $file = $partialUpload->UploadedFile();
+                $partialFiles[$partialUpload->Name] = sprintf(
+                    '%s - <a href="%s" target="_blank">%s</a>',
+                    Convert::raw2att($file->Name),
+                    Convert::raw2att($file->AbsoluteLink()),
+                    $file->AbsoluteLink()
+                );
+            }
+        }
+
+        return $partialFiles;
+    }
+
+    public static function getPartialsFromSession()
+    {
+        $session = Controller::curr()->getRequest()->getSession();
+        $submissionID = $session->get(PartialSubmissionController::SESSION_KEY);
+        return $submissionID ? PartialFormSubmission::get()->byID($submissionID) : null;
     }
 
     /**

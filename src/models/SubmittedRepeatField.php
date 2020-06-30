@@ -17,12 +17,12 @@ class SubmittedRepeatField extends SubmittedFormField
     public function getFormattedValue()
     {
         $submissions = json_decode($this->dbObject('Value')->RAW());
-        $template = '<b>%s</b>: %s<br />';
         $html = '';
+
         foreach ($submissions as $items) {
             $html .= '<p>';
             foreach ($items as $key => $value) {
-                $html .= sprintf($template, $key, $value);
+                $html .= sprintf('<b>%s</b>: %s<br />', $key, $value);
             }
             $html .= '</p>';
         }
@@ -37,15 +37,6 @@ class SubmittedRepeatField extends SubmittedFormField
      */
     public function getExportValue()
     {
-        $html = $this->getFormattedValue();
-        return $html->Plain();
-        $submissions = json_decode($this->dbObject('Value')->RAW());
-        $csv = '||';
-        foreach ($submissions as $items) {
-            foreach ($items as $key => $value) {
-                $csv .= sprintf('%s:%s||', $key, $value);
-            }
-        }
-        return $csv;
+        return $this->getFormattedValue()->Plain();
     }
 }

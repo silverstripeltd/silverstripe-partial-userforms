@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Models;
 
+use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
 use Firesphere\PartialUserforms\Forms\RepeatField;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Upload;
@@ -114,9 +115,13 @@ class EditableRepeatField extends EditableFormField
 
     public function getValueFromData($data)
     {
-        $maximum = $data[$this->Name] ? (int) $data[$this->Name]: 0;
-        $submissions = [];
+        $partialFiles = [];
+        if (!empty($data['PartialID'])) {
+            $partialFiles = PartialSubmissionController::getUploadLinks($data['PartialID']);
+        }
 
+        $submissions = [];
+        $maximum = $data[$this->Name] ? (int) $data[$this->Name]: 0;
         for ($index = 0; $index <= $maximum; $index++) {
             foreach ($this->Repeats() as $field) {
                 $fieldName = $index ? $field->Name . '__' . $index : $field->Name;
@@ -129,6 +134,10 @@ class EditableRepeatField extends EditableFormField
                     $value = $data[$fieldName];
                 } else {
                     $value = null;
+                }
+
+                if (!$value && isset($partialFiles[$fieldName])) {
+                    $value = $partialFiles[$fieldName];
                 }
 
                 if (!empty($data[$fieldName])) {
