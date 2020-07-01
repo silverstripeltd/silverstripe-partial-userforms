@@ -20,6 +20,9 @@ use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormVerifyController;
 use Firesphere\PartialUserforms\Forms\PasswordForm;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormController;
+use SilverStripe\UserForms\Model\EditableFormField;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\UserForms\Model\Submission\SubmittedFormField;
 
 /**
  * Class UserDefinedFormControllerExtension
@@ -284,5 +287,139 @@ class UserDefinedFormControllerExtension extends Extension
         if ($partialSubmission) {
             return $partialSubmission->getPartialLink();
         }
+    }
+
+    /**
+     * When form is submitted finished() function is called in
+     * vendor/silverstripe/userforms/code/Control/UserDefinedFormController.php
+     *
+     * SubmissionSummary is added to $data (Pass by reference) which is shown in template
+     * vendor/silverstripe/userforms/templates/SilverStripe/UserForms/Control/UserDefinedFormController_ReceivedFormSubmission.ss
+     * this template is overridden in MBIE site
+     */
+    public function updateReceivedFormSubmissionData(&$data)
+    {
+        if ($this->owner->ShowSubmissionSummary) {
+            $formID = $this->owner->ID;
+            $submissionID = $this->owner->request
+                ->getSession()
+                ->get('userformssubmission' . $formID);
+            $data["SubmissionSummary"] = $this->fetchSubmittedData($formID, $submissionID);
+        }
+        return true;
+    }
+
+    /**
+     * Returns ArrayList which is compilation of all Submitted Form Field and values
+     */
+    public function fetchSubmittedData($formPageID, $submissionID)
+    {
+        // Ignore following form fields as they are not part of submission
+        $ignoreFields = [
+            "SilverStripe\SpamProtection\EditableSpamProtectionField",
+            "SilverStripe\UserForms\Model\EditableFormField\EditableFormHeading",
+            "SilverStripe\UserForms\Model\EditableFormField\EditableLiteralField",
+            "SilverStripe\UserForms\Model\EditableFormField\EditableMemberListField",
+        ];
+
+        $formFields = EditableFormField::get()
+            ->where(['ParentID' => $formPageID])
+            ->exclude(['ClassName' => $ignoreFields])
+            ->sort('Sort'); // Order by fields as they appear in Form
+        $submittedData = SubmittedFormField::get()
+            ->where(['ParentID' => $submissionID]);
+
+        $stepsList = new ArrayList();
+        $fieldsList = new ArrayList();
+        $groupsList = new ArrayList();
+
+        $_fields = 0;
+        $groupTitle = '';
+
+        foreach ($formFields as $formField) {
+            if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFormStep") {
+                // Store title so when new step is encountered this title will be saved
+                // For first step do not add data just continue store title in currentTitle
+                if ($_fields == 0) {
+                    $stepTitle = $formField->Title ?? 'Section';
+                    $_fields++;
+                    continue;
+                }
+
+                if ($fieldsList->count() != 0) {
+                    $groupsList->add([
+                        'FieldGroupTitle' => '',
+                        'FieldsList' => $fieldsList
+                    ]);
+                    $fieldsList = new ArrayList();
+                }
+
+                $stepsList->add([
+                    'StepTitle' => $stepTitle,
+                    'FieldGroup' => $groupsList,
+                ]);
+                $stepTitle = $formField->Title ?? 'Section';
+                $groupsList = new ArrayList();
+                continue;
+            }
+
+            if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroup") {
+                // New group start detected - Store values of previous fields as ungrouped data
+                if ($fieldsList->Count()) {
+                    $groupsList->add([
+                        'FieldGroupTitle' => '',
+                        'FieldsList' => $fieldsList
+                    ]);
+                }
+                $groupTitle = $formField->Title ?? "";
+                $fieldsList = new ArrayList();
+                continue;
+            }
+            if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroupEnd") {
+                $groupsList->add([
+                    'FieldGroupTitle' => $groupTitle,
+                    'FieldsList' => $fieldsList
+                ]);
+                $fieldsList = new ArrayList();
+                continue;
+            }
+
+            // Process the current field
+            $submission = $submittedData->where(['Name' => $formField->Name])->first();
+
+            // Check if file is uploaded
+            if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFileField") {
+                $fieldsList->add([
+                    'FieldTitle' => $formField->Title ?? "Field Generic",
+                    // 'FieldValue' => $submission->getFileName(),  <--- Show filename - TBD
+                    'FieldValue' =>  $submission->getFileName() ? 'File uploaded' : '',
+                    'FieldClassName' => $formField->ClassName,
+                ]);
+                $_fields++;
+                continue;
+            }
+            $fieldsList->add([
+                'FieldTitle' => $formField->Title ?? '',
+                'FieldValue' => $submission->Value,
+                'FieldClassName' => $formField->ClassName,
+            ]);
+            $_fields++;
+        }
+
+        // Finalise data with remaning group values
+        if ($fieldsList->count() != 0) {
+            $groupsList->add([
+                'FieldGroupTitle' => '',
+                'FieldsList' => $fieldsList
+            ]);
+            $fieldsList = new ArrayList();
+        }
+
+        $stepsList->add([
+            'StepTitle' => $stepTitle,
+            'FieldGroup' => $groupsList,
+        ]);
+
+        return $stepsList;
     }
 }
