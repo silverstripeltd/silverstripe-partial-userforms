@@ -301,7 +301,7 @@ class UserDefinedFormControllerExtension extends Extension
     {
         if ($this->owner->ShowSubmissionSummary) {
             $formID = $this->owner->ID;
-            $submissionID = $this->owner->request
+            $submissionID = $this->owner->getRequest()
                 ->getSession()
                 ->get('userformssubmission' . $formID);
             $data["SubmissionSummary"] = $this->fetchSubmittedData($formID, $submissionID);
@@ -398,9 +398,27 @@ class UserDefinedFormControllerExtension extends Extension
                 $_fields++;
                 continue;
             }
+
+            // Repeated form fields
+            if ($formField->ClassName == "Firesphere\PartialUserforms\Models\EditableRepeatField") {
+                $count = 1;
+                $repeatedFieldsArray = json_decode($submission->Value, true);
+                foreach ($repeatedFieldsArray as $repeatedFields) {
+                    foreach ($repeatedFields as $key => $value) {
+                        $fieldsList->add([
+                            'FieldTitle' => $key . ' ' . $count++,
+                            'FieldValue' => $value,
+                            'FieldClassName' => $formField->ClassName,
+                        ]);
+                        $_fields++;
+                    }
+                }
+                continue;
+            }
+
             $fieldsList->add([
                 'FieldTitle' => $formField->Title ?? '',
-                'FieldValue' => $submission->Value,
+                'FieldValue' => $submission->getFormattedValue(),
                 'FieldClassName' => $formField->ClassName,
             ]);
             $_fields++;
