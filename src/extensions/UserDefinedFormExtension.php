@@ -37,6 +37,7 @@ class UserDefinedFormExtension extends DataExtension
         'FormOverview'             => 'Text',
         'SaveOnlyLabel'            => 'Varchar(50)',
         'SaveAndLogoutLabel'       => 'Varchar(50)',
+        'ShowSubmissionSummary'    => 'Boolean(true)',
     ];
 
     /**
@@ -120,6 +121,7 @@ class UserDefinedFormExtension extends DataExtension
                 ->setRows(3),
             TextField::create('SaveOnlyLabel', 'Save only Label'),
             TextField::create('SaveAndLogoutLabel', 'Save and logout Label'),
+            CheckboxField::create('ShowSubmissionSummary', 'Show form Submission Summary'),
         ]);
     }
 }
