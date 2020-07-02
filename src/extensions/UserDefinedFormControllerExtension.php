@@ -399,23 +399,6 @@ class UserDefinedFormControllerExtension extends Extension
                 continue;
             }
 
-            // Repeated form fields
-            if ($formField->ClassName == "Firesphere\PartialUserforms\Models\EditableRepeatField") {
-                $count = 1;
-                $repeatedFieldsArray = json_decode($submission->Value, true);
-                foreach ($repeatedFieldsArray as $repeatedFields) {
-                    foreach ($repeatedFields as $key => $value) {
-                        $fieldsList->add([
-                            'FieldTitle' => $key . ' ' . $count++,
-                            'FieldValue' => $value,
-                            'FieldClassName' => $formField->ClassName,
-                        ]);
-                        $_fields++;
-                    }
-                }
-                continue;
-            }
-
             $fieldsList->add([
                 'FieldTitle' => $formField->Title ?? '',
                 'FieldValue' => $submission->getFormattedValue(),
