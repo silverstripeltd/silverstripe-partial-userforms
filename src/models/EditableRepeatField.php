@@ -11,7 +11,7 @@ use SilverStripe\Core\Convert;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
-use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\FieldType\DBField;
@@ -106,7 +106,7 @@ class EditableRepeatField extends EditableFormField
                 'RepeatFields',
                 'Repeat Fields',
                 $this->Repeats(),
-                GridFieldConfig_RelationEditor::create()
+                GridFieldConfig_RecordEditor::create()
             )
         );
 
