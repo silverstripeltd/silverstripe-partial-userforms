@@ -1,6 +1,7 @@
 <fieldset class="repeat-fieldset">
     <% if $Message %><span class="message $MessageType">$Message</span><% end_if %>
-	<div class="middleColumn repeat-destination">
+    <div class="middleColumn repeat-destination"></div>
+    <div class="middleColumn repeat-source" style="display: none">
         <% loop $FieldList %>
             $FieldHolder
         <% end_loop %>

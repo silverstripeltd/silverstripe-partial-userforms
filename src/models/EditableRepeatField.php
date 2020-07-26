@@ -86,7 +86,8 @@ class EditableRepeatField extends EditableFormField
             }
         }
 
-        $field->setAttribute('data', $fieldData);
+        $field->setAttribute('data-maximum', $this->Maximum);
+        $field->setAttribute('data-fields', $fieldData);
         $this->doUpdateFormField($field);
         return $field;
     }
@@ -121,8 +122,13 @@ class EditableRepeatField extends EditableFormField
         }
 
         $submissions = [];
-        $maximum = $data[$this->Name] ? (int) $data[$this->Name]: 0;
-        for ($index = 0; $index <= $maximum; $index++) {
+        $repeatValues = $data[$this->Name] ? array_filter(explode(',', $data[$this->Name])) : [];
+        array_unshift($repeatValues, 0); // The original repeated field children
+
+        for ($index = 0; $index <= $this->Maximum; $index++) {
+            if (!in_array($index, $repeatValues)) {
+                continue;
+            }
             foreach ($this->Repeats() as $field) {
                 $fieldName = $index ? $field->Name . '__' . $index : $field->Name;
                 $field->Name = $fieldName;
