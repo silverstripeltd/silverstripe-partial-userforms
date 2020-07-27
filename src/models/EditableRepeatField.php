@@ -30,6 +30,8 @@ class EditableRepeatField extends EditableFormField
 
     private static $db = [
         'Maximum' => 'Int',
+        'RepeatLabel' => 'Varchar(100)',
+        'RemoveLabel' => 'Varchar(100)',
     ];
 
     private static $many_many = [
@@ -47,6 +49,14 @@ class EditableRepeatField extends EditableFormField
         if (!$this->Maximum) {
             $this->Maximum = 1;
         }
+
+        if (!$this->RepeatLabel) {
+            $this->RepeatLabel = 'Repeat';
+        }
+
+        if (!$this->RemoveLabel) {
+            $this->RemoveLabel = 'Remove';
+        }
     }
 
     public function getSubmittedFormField()
@@ -59,7 +69,7 @@ class EditableRepeatField extends EditableFormField
         // Add required javascripts
         Requirements::javascript('firesphere/partialuserforms:client/dist/repeatfield.js');
 
-        $field = RepeatField::create($this->Name, $this->Title ?: false)
+        $field = RepeatField::create($this->Name, $this->Title ?: null)
             ->setRightTitle($this->RightTitle)
             ->setFieldHolderTemplate(self::class . '_holder')
             ->setTemplate(self::class);
@@ -88,6 +98,8 @@ class EditableRepeatField extends EditableFormField
 
         $field->setAttribute('data-maximum', $this->Maximum);
         $field->setAttribute('data-fields', $fieldData);
+        $field->setAttribute('data-remove-label', $this->RemoveLabel);
+        $field->setRepeatLabel($this->RepeatLabel);
         $this->doUpdateFormField($field);
         return $field;
     }
@@ -96,9 +108,13 @@ class EditableRepeatField extends EditableFormField
     {
         $fields = parent::getCMSFields();
 
-        $fields->addFieldToTab(
+        $fields->addFieldsToTab(
             'Root.Main',
-            TextField::create('Maximum', 'Maximum repeats', $this->Maximum ?: 1)
+            [
+                TextField::create('Maximum', 'Maximum repeats', $this->Maximum),
+                TextField::create('RepeatLabel', 'Repeat button label', $this->RepeatLabel),
+                TextField::create('RemoveLabel', 'Remove button label', $this->RemoveLabel),
+            ]
         );
 
         $fields->addFieldToTab(
