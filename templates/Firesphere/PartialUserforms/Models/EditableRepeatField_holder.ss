@@ -7,7 +7,7 @@
         <% end_loop %>
     </div>
     <div class="middleColumn repeat-button<% if $extraClass %> $extraClass<% end_if %>">
-        <% if $Title %><legend class="left">$Title</legend><% end_if %>
+        <% if $RightTitle %><legend class="left">$RightTitle</legend><% end_if %>
         $Field
     </div>
 </fieldset>
