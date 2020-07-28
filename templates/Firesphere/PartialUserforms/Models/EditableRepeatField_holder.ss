@@ -6,7 +6,7 @@
             $FieldHolder
         <% end_loop %>
     </div>
-    <div class="middleColumn repeat-button<% if $extraClass %> $extraClass<% end_if %>">
+    <div class="middleColumn repeat-button">
         <% if $RightTitle %><legend class="left">$RightTitle</legend><% end_if %>
         $Field
     </div>

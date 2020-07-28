@@ -1,3 +1,7 @@
+.repeat-button button {
+    cursor: pointer;
+}
+
 .repeat-group {
     display: block;
     position: relative;
@@ -14,6 +18,7 @@
 }
 
 .repeat-group .delete-repeat-group {
+    cursor: pointer;
     position: absolute;
     top: 0;
     right: 0;
