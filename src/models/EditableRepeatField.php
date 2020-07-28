@@ -49,14 +49,6 @@ class EditableRepeatField extends EditableFormField
         if (!$this->Maximum) {
             $this->Maximum = 1;
         }
-
-        if (!$this->RepeatLabel) {
-            $this->RepeatLabel = 'Repeat';
-        }
-
-        if (!$this->RemoveLabel) {
-            $this->RemoveLabel = 'Remove';
-        }
     }
 
     public function getSubmittedFormField()
@@ -68,6 +60,7 @@ class EditableRepeatField extends EditableFormField
     {
         // Add required javascripts
         Requirements::javascript('firesphere/partialuserforms:client/dist/repeatfield.js');
+        Requirements::css('firesphere/partialuserforms:client/dist/repeatfield.css');
 
         $field = RepeatField::create($this->Name, $this->Title ?: null)
             ->setRightTitle($this->RightTitle)

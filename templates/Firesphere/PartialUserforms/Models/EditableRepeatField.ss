@@ -2,9 +2,7 @@
 <button class="btn btn-add-more" $getAttributesHTML("class", "id", "name")>
     <% if $RepeatLabel %>
         $RepeatLabel
-    <% else_if $RightTitle %>
-        $RightTitle
     <% else %>
-        Repeat
+        &#43;
     <% end_if %>
 </button>

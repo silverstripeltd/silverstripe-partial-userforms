@@ -37,10 +37,13 @@ const hideRepeatGroup = (event) => {
     const values = parseCSV(hiddenInput.value).filter(item => item != counter);
     const resetForm = document.createElement('form');
     hiddenInput.value = values.join(',');
-    resetForm.appendChild(buttonContainer);
-    resetForm.reset(); //resets input values
-    source.appendChild(buttonContainer);
-    addButtonContainer.style.display = 'block';
+    buttonContainer.className = 'repeat-group animation-out';
+    setTimeout(() => {
+        resetForm.appendChild(buttonContainer);
+        resetForm.reset(); //resets input values
+        source.appendChild(buttonContainer);
+        addButtonContainer.style.display = 'block';
+    }, 500);
 };
 
 const initialiseRepeatedFields = (repeatButton) => {
@@ -54,6 +57,7 @@ const initialiseRepeatedFields = (repeatButton) => {
     const destination = mainContainer.querySelector('.repeat-destination');
     const hiddenInput = buttonContainer.querySelector('input[type=hidden]');
     const fieldName = hiddenInput.getAttribute('name');
+    const removeBtnLabel = repeatButton.getAttribute('data-remove-label');
     let original;
     Object.keys(hiddenData).forEach(function (index) {
         for (let i = 0; i <= parseInt(hiddenData[index]); i++) {
@@ -71,7 +75,7 @@ const initialiseRepeatedFields = (repeatButton) => {
                 if (i > 0) {
                     let deleteButton = document.createElement('button');
                     deleteButton.className = 'delete-repeat-group';
-                    deleteButton.textContent = '\u00D7';
+                    deleteButton.textContent = removeBtnLabel || '\u00D7';
                     deleteButton.setAttribute('data-counter', i);
                     deleteButton.setAttribute('data-name', fieldName);
                     groupContainer.appendChild(deleteButton);
@@ -108,6 +112,7 @@ const toggleRepeatedFields = (repeatButton) => {
     values.forEach(counter => {
         let groupContainer = source.querySelector(`#repeat-${fieldName}__${counter}`);
         if (groupContainer) {
+            groupContainer.className = 'repeat-group animation-in';
             destination.appendChild(groupContainer);
         }
     });
