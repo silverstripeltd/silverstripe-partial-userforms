@@ -58,6 +58,7 @@ const initialiseRepeatedFields = (repeatButton) => {
     const hiddenInput = buttonContainer.querySelector('input[type=hidden]');
     const fieldName = hiddenInput.getAttribute('name');
     const removeBtnLabel = repeatButton.getAttribute('data-remove-label');
+    const removeBtnCss = repeatButton.getAttribute('data-remove-css') || '';
     let original;
     Object.keys(hiddenData).forEach(function (index) {
         for (let i = 0; i <= parseInt(hiddenData[index]); i++) {
@@ -74,7 +75,7 @@ const initialiseRepeatedFields = (repeatButton) => {
                 groupContainer.appendChild(hr);
                 if (i > 0) {
                     let deleteButton = document.createElement('button');
-                    deleteButton.className = 'delete-repeat-group';
+                    deleteButton.className = 'delete-repeat-group ' + removeBtnCss;
                     deleteButton.textContent = removeBtnLabel || '\u00D7';
                     deleteButton.setAttribute('data-counter', i);
                     deleteButton.setAttribute('data-name', fieldName);

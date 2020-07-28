@@ -92,6 +92,7 @@ class EditableRepeatField extends EditableFormField
         $field->setAttribute('data-maximum', $this->Maximum);
         $field->setAttribute('data-fields', $fieldData);
         $field->setAttribute('data-remove-label', $this->RemoveLabel);
+        $field->setAttribute('data-remove-css', $this->ExtraClass);
         $field->setRepeatLabel($this->RepeatLabel);
         $this->doUpdateFormField($field);
         return $field;
