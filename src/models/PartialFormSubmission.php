@@ -4,8 +4,11 @@ namespace Firesphere\PartialUserforms\Models;
 
 use Exception;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormVerifyController;
+use Firesphere\PartialUserforms\Models\EditableRepeatField;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldButtonRow;
@@ -19,8 +22,10 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\RandomGenerator;
+use SilverStripe\UserForms\Model\Submission\SubmittedFileField;
 use SilverStripe\UserForms\Model\Submission\SubmittedForm;
 use SilverStripe\UserForms\Model\UserDefinedForm;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFormStep;
 
 /**
  * Class \Firesphere\PartialUserforms\Models\PartialFormSubmission
@@ -131,16 +136,63 @@ class PartialFormSubmission extends SubmittedForm
             'PHPSessionID'
         ]);
 
-        $partialFields = $this->PartialFields();
-        $fileFields = $this->PartialUploads();
         $list = ArrayList::create();
-        $list->merge($partialFields);
-        $list->merge($fileFields);
+        $partials = ArrayList::create();
+        $partials->merge($this->PartialFields());
+        $partials->merge($this->PartialUploads());
+        $editableFields = $this->Parent()
+            ->Fields()
+            ->exclude('ClassName', EditableFormStep::class)
+            ->sort('Sort')
+            ->filterByCallback(function($item, $list) {
+                return !Config::inst()->get($item, 'literal');
+            });
+
+        foreach ($editableFields as $editable) {
+            $partial = $partials->find('Name', $editable->Name);
+            if (!$partial) {
+                continue;
+            }
+            if ($editable->ClassName === EditableRepeatField::class) {
+                $submissions = [];
+                $repeatValues = $partial->Value ? array_filter(explode(',', $partial->Value)) : [];
+                array_unshift($repeatValues, 0);
+
+                for($index = 0; $index <= $editable->Maximum; $index++) {
+                    if (!in_array($index, $repeatValues)) {
+                        continue;
+                    }
+                    foreach ($editable->Repeats() as $field) {
+                        $fieldName = $index ? $field->Name . '__' . $index : $field->Name;
+                        $partial = $partials->find('Name', $fieldName);
+                        $value = null;
+                        if ($partial) {
+                            $value = $partial->Value;
+                            if ($partial instanceof SubmittedFileField) {
+                                $value = sprintf(
+                                    '%s - <a href="%s" target="_blank">%s</a>',
+                                    Convert::raw2att($partial->getFileName()),
+                                    Convert::raw2att($partial->getLink()),
+                                    $partial->getLink()
+                                );
+                            }
+                        }
+                        $submissions[$index][$field->Title] = $value;
+                    }
+                }
+                $list->push(SubmittedRepeatField::create([
+                    'Title' => $editable->Title,
+                    'Value' => json_encode($submissions)
+                ]));
+            } else {
+                $list->push($partial);
+            }
+        }
 
         $partialFields = GridField::create(
             'PartialFields',
             _t(static::class . '.PARTIALFIELDS', 'Partial fields'),
-            $list->sort('ID')
+            $list
         );
 
         $exportColumns = [
