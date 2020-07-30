@@ -1,4 +1,5 @@
-const baseDomain = document.baseURI;
+const baseDomain = document.baseURI
+    || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '' + '/'));
 const submitURL = 'partialuserform/save';
 const form = document.body.querySelector('form.userform');
 const formElements = () => Array.from(form.querySelectorAll('[name]:not([type=submit])'));
@@ -44,7 +45,6 @@ const submitPartial = () => {
   formElements().forEach(element => {
     const fieldName = element.getAttribute('name');
     const value = getElementValue(element, fieldName);
-    if (!data.has(fieldName)) {
       if (typeof value === 'object' && element.getAttribute('type') === 'file') {
         data.append(fieldName, value);
       } else if (typeof value === 'object') {
@@ -54,7 +54,6 @@ const submitPartial = () => {
       } else {
         data.append(fieldName, value);
       }
-    }
   });
 
   /** global: XMLHttpRequest */
