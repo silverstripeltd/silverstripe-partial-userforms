@@ -117,7 +117,7 @@ const toggleRepeatedFields = (repeatButton) => {
             destination.appendChild(groupContainer);
         }
     });
-    buttonContainer.style.display = (values.length >= maximum) ? 'none' : 'block';
+    buttonContainer.style.display = (values.filter(i => i).length >= maximum) ? 'none' : 'block';
 };
 
 window.addEventListener('DOMContentLoaded', (event) => {
