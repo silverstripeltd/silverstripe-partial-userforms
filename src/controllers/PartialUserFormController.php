@@ -78,6 +78,7 @@ class PartialUserFormController extends UserDefinedFormController
 
         // Add required javascripts
         Requirements::javascript('firesphere/partialuserforms:client/dist/main.js');
+        Requirements::javascript('firesphere/partialuserforms:client/dist/onready.js');
 
         /** @var UserForm $form */
         $form = $controller->Form();
