@@ -158,17 +158,17 @@ class PartialUserFormController extends UserDefinedFormController
 
         // If invalid sessions or if the last session was from the same user or that the recent session has expired
         if (
-            !$submissionID ||
-            !$partial ||
-            !$partial->PHPSessionID ||
-            $phpSessionID === $partial->PHPSessionID ||
-            $partial->dbObject('LockedOutUntil')->InPast()
+            !$submissionID
+            || !$partial
+            || !$partial->PHPSessionID
+            || ($partial->LockedOutUntil && $partial->dbObject('LockedOutUntil')->InPast())
+            || $phpSessionID === $partial->PHPSessionID
         ) {
             return false;
         }
 
         // Lockout when there's an ongoing session
-        return $phpSessionID !== $partial->PHPSessionID && $partial->dbObject('LockedOutUntil')->InFuture();
+        return $partial->LockedOutUntil && $partial->dbObject('LockedOutUntil')->InFuture();
     }
 
     /**

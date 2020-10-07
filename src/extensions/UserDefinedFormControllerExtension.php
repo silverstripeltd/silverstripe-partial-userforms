@@ -11,6 +11,7 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\UserForms\Control\UserDefinedFormController;
 use Firesphere\PartialUserforms\Models\PartialFieldSubmission;
 use Firesphere\PartialUserforms\Models\PartialFileFieldSubmission;
@@ -198,6 +199,7 @@ class UserDefinedFormControllerExtension extends Extension
         $form = $this->OverviewForm($request);
         if ($formLocked) {
             $form->unsetAllActions();
+            $form->Fields()->removeByName('Password');
         } else {
             // Clear session if it's not locked (e.g. session belongs to the user)
             PartialSubmissionController::clearLockSession();
@@ -270,6 +272,13 @@ class UserDefinedFormControllerExtension extends Extension
     {
         $request = $this->owner->getRequest();
         $session = $request->getSession();
+        $submissionID = $session->get(PartialSubmissionController::SESSION_KEY);
+        $partial = PartialFormSubmission::get()->byID($submissionID);
+        if ($partial) {
+            $partial->LockedOutUntil = DBDatetime::now()->Rfc2822();
+            $partial->PHPSessionID = null;
+            $partial->write();
+        }
         $session->clear(PartialSubmissionController::SESSION_KEY);
         $session->clear(PasswordForm::PASSWORD_SESSION_KEY);
         $session->clear(PartialUserFormVerifyController::PASSWORD_KEY);
