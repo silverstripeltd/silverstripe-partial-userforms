@@ -195,6 +195,7 @@ class UserDefinedFormControllerExtension extends Extension
             return $this->owner->redirect($this->owner->Link());
         }
 
+        $hasFormSaved = false;
         $formLocked = PartialUserFormController::isLockedOut();
         $form = $this->OverviewForm($request);
         if ($formLocked) {
@@ -205,9 +206,13 @@ class UserDefinedFormControllerExtension extends Extension
             PartialSubmissionController::clearLockSession();
         }
 
+        $hasFormSaved = $request->getSession()
+            ->get(PartialSubmissionController::SESSION_KEY . '_HasFormSaved');
+
         return $this->owner->customise([
             'Form' => $form,
             'FormLocked' => $formLocked,
+            'HasFormSaved' => (boolean) $hasFormSaved,
             'PartialForm' => $this->getPartialFormSubmission(),
         ]);
     }
@@ -280,6 +285,7 @@ class UserDefinedFormControllerExtension extends Extension
             $partial->write();
         }
         $session->clear(PartialSubmissionController::SESSION_KEY);
+        $session->clear(PartialSubmissionController::SESSION_KEY . '_HasFormSaved');
         $session->clear(PasswordForm::PASSWORD_SESSION_KEY);
         $session->clear(PartialUserFormVerifyController::PASSWORD_KEY);
         return $this->owner->redirect($this->owner->Link('start'));

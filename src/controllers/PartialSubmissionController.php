@@ -87,6 +87,7 @@ class PartialSubmissionController extends ContentController
         }
 
         $return = $partialSubmission->exists();
+        $request->getSession()->set(self::SESSION_KEY . '_HasFormSaved', true);
 
         return new HTTPResponse($return, ($return ? 201 : 400));
     }
@@ -134,6 +135,7 @@ class PartialSubmissionController extends ContentController
         }
 
         $session->set(self::SESSION_KEY, $partial->ID);
+        $session->set(self::SESSION_KEY . '_HasFormSaved', false);
 
         $now = new \DateTime(DBDatetime::now()->getValue());
         $now->add(new \DateInterval('PT30M'));

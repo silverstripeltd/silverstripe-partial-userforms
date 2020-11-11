@@ -38,6 +38,7 @@ class UserDefinedFormExtension extends DataExtension
         'SaveOnlyLabel'            => 'Varchar(50)',
         'SaveAndLogoutLabel'       => 'Varchar(50)',
         'ShowSubmissionSummary'    => 'Boolean(true)',
+        'SaveAndLogoutMessage'     => 'Text',
     ];
 
     /**
@@ -104,6 +105,10 @@ class UserDefinedFormExtension extends DataExtension
 
         $introTextDescription = _t(__CLASS__ . '.introTextDescription', 'Text to display at the introduction page, before the user has started the form.');
         $overviewTextDescription = _t(__CLASS__ . '.overviewTextDescription', 'Text to display on the overview page of the form, alongside form credentials.');
+        $saveAndLogoutDescription = _t(
+            __CLASS__ . '.overviewSaveAndLogout',
+            'Text to display on the overview page of the form after Save and logout.'
+        );
 
         $fields->addFieldToTab(
             'Root.FormOptions',
@@ -122,6 +127,9 @@ class UserDefinedFormExtension extends DataExtension
             TextField::create('SaveOnlyLabel', 'Save only Label'),
             TextField::create('SaveAndLogoutLabel', 'Save and logout Label'),
             CheckboxField::create('ShowSubmissionSummary', 'Show form Submission Summary'),
+            TextareaField::create('SaveAndLogoutMessage', 'Save and logout message')
+                ->setDescription($saveAndLogoutDescription)
+                ->setRows(3),
         ]);
     }
 }
