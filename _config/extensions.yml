@@ -13,3 +13,6 @@ SilverStripe\SiteConfig\SiteConfig:
 SilverStripe\UserForms\Model\Submission\SubmittedFileField:
   extensions:
     - Firesphere\PartialUserforms\Extensions\SubmittedFileFieldExtension
+SilverStripe\UserForms\Model\EditableFormField\EditableFileField:
+  extensions:
+    - Firesphere\PartialUserforms\Extensions\EditableFileFieldExtension
