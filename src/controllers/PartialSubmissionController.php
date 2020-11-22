@@ -66,6 +66,10 @@ class PartialSubmissionController extends ContentController
         $submissionID = $request->getSession()->get(self::SESSION_KEY);
 
         $editableField = null;
+        $editableFiles = [
+            'Names' => [],
+            'SubmittedFormID' => $submissionID,
+        ];
         foreach ($postVars as $field => $value) {
             /** @var EditableFormField $editableField */
             $editableField = $this->createOrUpdateSubmission([
@@ -73,6 +77,9 @@ class PartialSubmissionController extends ContentController
                 'Value'           => $value,
                 'SubmittedFormID' => $submissionID
             ]);
+            if ($editableField instanceof EditableFormField\EditableFileField) {
+                $editableFiles['Names'][] = $field;
+            }
         }
 
         if ($editableField instanceof EditableFormField && !$partialSubmission->UserDefinedFormID) {
@@ -89,7 +96,26 @@ class PartialSubmissionController extends ContentController
         $return = $partialSubmission->exists();
         $request->getSession()->set(self::SESSION_KEY . '_HasFormSaved', true);
 
-        return new HTTPResponse($return, ($return ? 201 : 400));
+        $uploadedFiles = [];
+        if ($editableFiles['Names']) {
+            $records = PartialFileFieldSubmission::get()->filter([
+                'SubmittedFormID' => $submissionID,
+                'Name' => $editableFiles['Names'],
+                'UploadedFileID:not' => 0,
+            ]);
+            foreach ($records as $file) {
+                $uploadedFiles[] = [
+                    'Name' => $file->Name,
+                    'PartialID' => $submissionID,
+                    'FileID' => $file->UploadedFileID,
+                    'Title' => $file->UploadedFile()->Name,
+                    'Link' => $file->UploadedFile()->AbsoluteLink(),
+                ];
+            }
+        }
+
+        $response = new HTTPResponse(json_encode($uploadedFiles), ($return ? 201 : 400));
+        return $response->addHeader('Content-Type', 'application/json');
     }
 
     /**
@@ -107,7 +133,7 @@ class PartialSubmissionController extends ContentController
 
         $uploadedFile = File::create();
         $partialUploads = $partialSubmission->PartialUploads();
-        $fileSubmission = $partialUploads->find('UploadedFileID', $postVars['fileID']);
+        $fileSubmission = $partialUploads->find('UploadedFileID', $postVars['FileID']);
         if ($fileSubmission) {
             $partialUploads->remove($fileSubmission);
             $uploadedFile = $fileSubmission->UploadedFile();

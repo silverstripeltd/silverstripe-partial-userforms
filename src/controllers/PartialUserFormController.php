@@ -200,7 +200,7 @@ class PartialUserFormController extends UserDefinedFormController
 
         foreach ($uploads as $upload) {
             $file = $upload->UploadedFile();
-            $fileAttributes = ['PartialID' => $partial->ID, 'fileID' => $file->ID];
+            $fileAttributes = ['PartialID' => $partial->ID, 'FileID' => $file->ID];
             $linkTag = 'View <a href="%s" target="_blank">%s</a> &nbsp;
                 <a class="partial-file-remove" href="javascript:;" data-disabled="" data-file-remove=\'%s\'>Remove &cross;</a>';
             $fileLink = sprintf(

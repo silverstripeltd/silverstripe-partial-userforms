@@ -9,6 +9,7 @@ const shareButton = form.querySelector('a.step-button-share');
 const submitButton = form.querySelector('[type=submit]');
 const repeatButton = form.querySelectorAll('button.btn-add-more');
 const removeFileButton = form.querySelectorAll('a.partial-file-remove');
+const uploadButtons = form.querySelectorAll('input[type=file]');
 const requests = [];
 
 const getElementValue = (element, fieldName) => {
@@ -76,6 +77,8 @@ const submitPartial = () => {
   requests.push(httpRequest);
   httpRequest.open('POST', `${baseDomain}${submitURL}`, true);
   httpRequest.send(data);
+
+  return httpRequest;
 };
 
 const replaceExistingAttribute = (dom, attr, previous, latest) => {
@@ -87,23 +90,45 @@ const replaceExistingAttribute = (dom, attr, previous, latest) => {
   });
 };
 
+const createUploadLinksHolder = (name, elementHolder) => {
+  let span = elementHolder.querySelector(`span#${name}`);
+  if (span) {
+    while (span.firstChild) {
+      span.removeChild(span.lastChild);
+    }
+  } else {
+    span = document.createElement('span');
+    span.setAttribute('id', name);
+    elementHolder.appendChild(span);
+  }
+  span.setAttribute('class', 'right-title');
+  return span;
+};
+
 const removePartialFile = (event) => {
   event.preventDefault();
 
   const link = event.target;
   const form = new FormData();
+  const holder = link.parentNode.parentNode;
+  const name = link.parentNode.getAttribute('id');
+  const disabled = link.getAttribute('data-disabled');
   const linkData = JSON.parse(link.getAttribute('data-file-remove'));
-  let disabled = link.getAttribute('data-disabled');
+  let span = createUploadLinksHolder(name, holder);
+
+  if (disabled === 'disabled') {
+    span.appendChild(document.createTextNode('Still in progress...'));
+    span.setAttribute('class', 'right-title loading');
+    return;
+  }
+
   Object.keys(linkData).forEach(function (name) {
     form.append(name, linkData[name]);
   });
 
-  if (disabled === 'disabled') {
-    console.log('button disabled');
-    return;
-  }
-
   link.setAttribute('data-disabled', 'disabled');
+  span.appendChild(document.createTextNode('Removing selected file...'));
+  span.setAttribute('class', 'right-title loading');
 
   /** global: XMLHttpRequest */
   const httpRequest = new XMLHttpRequest();
@@ -112,7 +137,8 @@ const removePartialFile = (event) => {
       if (httpRequest.status === 409) {
         alert(httpRequest.responseText);
       } else {
-        link.parentNode.innerHTML = '';
+        span = createUploadLinksHolder(name, holder);
+        span.appendChild(document.createTextNode('We accept .png, .jpg and .pdf'));
       }
     }
   };
@@ -120,6 +146,62 @@ const removePartialFile = (event) => {
   requests.push(httpRequest);
   httpRequest.open('POST', `${baseDomain}partialuserform/remove-file`, true);
   httpRequest.send(form);
+};
+
+const createUploadLinks = (record) => {
+  const name = record['Name'];
+  const field = document.body.querySelector(`[name=${name}]`);
+  const holder = field.parentNode.parentNode;
+  let span = createUploadLinksHolder(`${name}_right_title`, holder);
+
+  span.appendChild(document.createTextNode('View '));
+
+  const viewLink = document.createElement('a');
+  viewLink.setAttribute('class', 'external');
+  viewLink.setAttribute('rel', 'external');
+  viewLink.setAttribute('title', 'Open external link');
+  viewLink.setAttribute('href', record['Link']);
+  viewLink.setAttribute('target', '_blank');
+  viewLink.appendChild(document.createTextNode(record['Title']));
+  span.appendChild(viewLink);
+  span.appendChild(document.createTextNode(" \u00A0"));
+
+  const removeLink = document.createElement('a');
+  removeLink.setAttribute('class', 'partial-file-remove');
+  removeLink.setAttribute('href', 'javascript:;');
+  removeLink.setAttribute('data-disabled', '');
+  removeLink.setAttribute('data-file-remove', `{"PartialID":${record['PartialID']},"FileID":${record['FileID']}}`);
+  removeLink.appendChild(document.createTextNode('Remove ✗'));
+  removeLink.addEventListener('click', removePartialFile);
+  span.appendChild(removeLink);
+};
+
+const uploadPartialHandler = (event) => {
+  const uploadField = event.target;
+  if (!uploadField.value) {
+    return;
+  }
+  const parentHolder = uploadField.parentNode;
+  const httpRequest = submitPartial();
+  const holder = parentHolder.parentNode;
+  const name = uploadField.getAttribute('name');
+  let span = createUploadLinksHolder(`${name}_right_title`, holder);
+
+  span.appendChild(document.createTextNode('Uploading selected file...'));
+  span.setAttribute('class', 'right-title loading');
+
+  httpRequest.onload = () => {
+    if (httpRequest.status == 201) {
+      const records = JSON.parse(httpRequest.responseText);
+      for (let index = 0; index < records.length; index++) {
+        if (records[index]['Name'] === name) {
+          createUploadLinks(records[index]);
+        }
+      }
+    }
+
+    span.setAttribute('class', 'right-title');
+  }
 };
 
 const attachSavePartial = () => {
@@ -135,6 +217,12 @@ const attachSavePartial = () => {
   if (removeFileButton.length) {
     for (let index = 0; index < removeFileButton.length; index++) {
       removeFileButton[index].addEventListener('click', removePartialFile);
+    }
+  }
+
+  if (uploadButtons.length) {
+    for (let index = 0; index < uploadButtons.length; index++) {
+      uploadButtons[index].addEventListener('change', uploadPartialHandler);
     }
   }
 };
