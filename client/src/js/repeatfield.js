@@ -26,6 +26,12 @@ const duplicateFields = (event) => {
 const hideRepeatGroup = (event) => {
     event.preventDefault();
     const button = event.target;
+    if (button.getAttribute('data-warned') != 1) {
+        button.setAttribute('data-warned', 1);
+        return window.alert('Before deleting extra field set, make the values are cleared.');
+    }
+    button.setAttribute('data-warned', 0);
+
     const buttonContainer = button.parentNode;
     const mainContainer = buttonContainer.parentNode.parentNode;
     const source = mainContainer.querySelector('.repeat-source');
@@ -79,6 +85,7 @@ const initialiseRepeatedFields = (repeatButton) => {
                     deleteButton.textContent = removeBtnLabel || '\u00D7';
                     deleteButton.setAttribute('data-counter', i);
                     deleteButton.setAttribute('data-name', fieldName);
+                    deleteButton.setAttribute('data-warned', 0);
                     groupContainer.appendChild(deleteButton);
                     deleteButton.addEventListener('click', hideRepeatGroup);
                 }
