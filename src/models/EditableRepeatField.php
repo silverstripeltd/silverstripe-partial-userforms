@@ -145,9 +145,9 @@ class EditableRepeatField extends EditableFormField
                 $title = $field->getField('Title') ?: $fieldName;
 
                 if ($field->hasMethod('getValueFromData')) {
-                    $value = $field->getValueFromData($data);
+                    $value = Convert::raw2xml($field->getValueFromData($data));
                 } elseif (isset($data[$fieldName])) {
-                    $value = $data[$fieldName];
+                    $value = Convert::raw2xml($data[$fieldName]);
                 } else {
                     $value = null;
                 }
