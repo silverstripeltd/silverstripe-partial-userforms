@@ -204,6 +204,18 @@ const uploadPartialHandler = (event) => {
   }
 };
 
+const sharePartial = (event) => {
+  event.preventDefault();
+  const linkTag = event.target;
+  const httpRequest = submitPartial();
+
+  httpRequest.onload = () => {
+    if (httpRequest.status == 201) {
+      document.location.href = linkTag.getAttribute('href');
+    }
+  }
+};
+
 const attachSavePartial = () => {
   if (saveButton) {
     saveButton.addEventListener('click', submitPartial);
@@ -212,7 +224,7 @@ const attachSavePartial = () => {
     nextButton.addEventListener('click', submitPartial);
   }
   if (shareButton) {
-    shareButton.addEventListener('click', submitPartial);
+    shareButton.addEventListener('click', sharePartial);
   }
   if (removeFileButton.length) {
     for (let index = 0; index < removeFileButton.length; index++) {
