@@ -38,7 +38,7 @@ class UserDefinedFormExtension extends DataExtension
         'FormOverview'             => 'HTMLText',
         'SaveOnlyLabel'            => 'Varchar(50)',
         'SaveAndLogoutLabel'       => 'Varchar(50)',
-        'ShowSubmissionSummary'    => 'Boolean(true)',
+        'ShowSubmissionSummary'    => 'Boolean(false)',
         'SaveAndLogoutMessage'     => 'Text',
     ];
 
