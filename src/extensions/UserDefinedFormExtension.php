@@ -11,6 +11,7 @@ use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\UserForms\Model\UserDefinedForm;
+use SilverStripe\Forms\HTMLEditor\HtmlEditorField;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
@@ -33,11 +34,11 @@ class UserDefinedFormExtension extends DataExtension
         'EnablePartialSubmissions' => 'Boolean(false)',
         'ExportPartialSubmissions' => 'Boolean(true)',
         'PasswordProtected'        => 'Boolean(false)',
-        'FormIntroduction'         => 'Text',
-        'FormOverview'             => 'Text',
+        'FormIntroduction'         => 'HTMLText',
+        'FormOverview'             => 'HTMLText',
         'SaveOnlyLabel'            => 'Varchar(50)',
         'SaveAndLogoutLabel'       => 'Varchar(50)',
-        'ShowSubmissionSummary'    => 'Boolean(true)',
+        'ShowSubmissionSummary'    => 'Boolean(false)',
         'SaveAndLogoutMessage'     => 'Text',
     ];
 
@@ -118,10 +119,10 @@ class UserDefinedFormExtension extends DataExtension
             $enablePartialCheckbox,
             $pwdCheckbox,
             $partialCheckbox,
-            TextareaField::create('FormIntroduction', 'Form introduction text')
+            HtmlEditorField::create('FormIntroduction', 'Form introduction text')
                 ->setDescription($introTextDescription)
                 ->setRows(3),
-            TextareaField::create('FormOverview', 'Form overview text')
+            HtmlEditorField::create('FormOverview', 'Form overview text')
                 ->setDescription($overviewTextDescription)
                 ->setRows(3),
             TextField::create('SaveOnlyLabel', 'Save only Label'),
