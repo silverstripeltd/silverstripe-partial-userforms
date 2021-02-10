@@ -42,6 +42,9 @@ const getElementValue = (element, fieldName) => {
 };
 
 const submitPartial = () => {
+  // This will trigger recaptcha validation
+  grecaptcha.execute(recaptchaId);
+
   const data = new FormData();
   formElements().forEach(element => {
     const fieldName = element.getAttribute('name');
@@ -259,3 +262,32 @@ export default function () {
   attachSavePartial();
   abortPendingSubmissions();
 }
+
+let recaptchaId = null;
+/*
+  - Function called onload in https://www.google.com/recaptcha/api.js?render=explicit&onload=loadRecaptcha
+  - Above script src added in src/controllers/PartialUserFormController.php
+  - Assumption
+    <div id="g-recaptcha-partial-userform" data-sitekey="$RecaptchaSitekey"></div> tag is present in template
+**/
+window.loadRecaptcha = function () {
+  var captchaElement = document.getElementById('g-recaptcha-partial-userform');
+  var captchaOptions = {
+    sitekey: captchaElement.dataset.sitekey,
+    size: 'invisible',
+    callback: handleAction,
+    'expired-callback': function () {
+      alert('Expired reCAPTCHA response and the you will need to re-verify.');
+      return false;
+    },
+  };
+  recaptchaId = grecaptcha.render(captchaElement, captchaOptions);
+};
+
+// reCaptcha callback - Do the main processing here
+window.handleAction = function () {
+  // if there is no previous reponse then execute recaptcha else do nothing (As we are not processing any form data here, it's done in submitPartial function)
+  grecaptcha.execute(recaptchaId);
+  // Once recaptcha is validated reset recaptcha token for next action captcha validation
+  grecaptcha.reset(recaptchaId);
+};

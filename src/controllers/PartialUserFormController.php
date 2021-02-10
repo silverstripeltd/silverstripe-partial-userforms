@@ -80,6 +80,10 @@ class PartialUserFormController extends UserDefinedFormController
         Requirements::javascript('firesphere/partialuserforms:client/dist/main.js');
         Requirements::javascript('firesphere/partialuserforms:client/dist/onready.js');
 
+        if ($page->EnableRecaptcha) {
+            Requirements::javascript('https://www.google.com/recaptcha/api.js?render=explicit&onload=loadRecaptcha');
+        }
+
         /** @var UserForm $form */
         $form = $controller->Form();
         $form->loadDataFrom($partial->getFields());

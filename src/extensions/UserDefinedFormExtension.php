@@ -39,6 +39,7 @@ class UserDefinedFormExtension extends DataExtension
         'SaveOnlyLabel'            => 'Varchar(50)',
         'SaveAndLogoutLabel'       => 'Varchar(50)',
         'ShowSubmissionSummary'    => 'Boolean(false)',
+        'EnableRecaptcha'          => 'Boolean(false)',
         'SaveAndLogoutMessage'     => 'Text',
     ];
 
@@ -104,6 +105,14 @@ class UserDefinedFormExtension extends DataExtension
             'The configuration and global export configuration can be set in the site Settings'
         ));
 
+        $enableRecaptcha = CheckboxField::create(
+            'EnableRecaptcha',
+            _t(__CLASS__ . '.enableRecaptchaLabel', 'Enable Invisible ReCAPTCHA')
+        )->setDescription(_t(
+            __CLASS__ . '.enableRecaptchaDescription',
+            'ReCAPTCHA will be triggered on File upload & Submit,Share or Save button click'
+        ));
+
         $introTextDescription = _t(__CLASS__ . '.introTextDescription', 'Text to display at the introduction page, before the user has started the form.');
         $overviewTextDescription = _t(__CLASS__ . '.overviewTextDescription', 'Text to display on the overview page of the form, alongside form credentials.');
         $saveAndLogoutDescription = _t(
@@ -119,6 +128,7 @@ class UserDefinedFormExtension extends DataExtension
             $enablePartialCheckbox,
             $pwdCheckbox,
             $partialCheckbox,
+            $enableRecaptcha,
             HtmlEditorField::create('FormIntroduction', 'Form introduction text')
                 ->setDescription($introTextDescription)
                 ->setRows(3),

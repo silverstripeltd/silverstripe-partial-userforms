@@ -1,1 +1,590 @@
-!function(e){var t={};function r(n){if(t[n])return t[n].exports;var o=t[n]={i:n,l:!1,exports:{}};return e[n].call(o.exports,o,o.exports,r),o.l=!0,o.exports}r.m=e,r.c=t,r.d=function(e,t,n){r.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:n})},r.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},r.t=function(e,t){if(1&t&&(e=r(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var n=Object.create(null);if(r.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)r.d(n,o,function(t){return e[t]}.bind(null,o));return n},r.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return r.d(t,"a",t),t},r.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},r.p="/",r(r.s=0)}([function(e,t,r){e.exports=r(3)},,,function(e,t,r){"use strict";r.r(t);var n=function(){var e;try{e=Symbol.iterator?Symbol.iterator:"Symbol(Symbol.iterator)"}catch(t){e="Symbol(Symbol.iterator)"}var t=Object.prototype.toString,r=function(e){return"function"==typeof e||"[object Function]"===t.call(e)},n=Math.pow(2,53)-1,o=function(e){var t=function(e){var t=Number(e);return isNaN(t)?0:0!==t&&isFinite(t)?(t>0?1:-1)*Math.floor(Math.abs(t)):t}(e);return Math.min(Math.max(t,0),n)},a=function(t,r){var n=t&&r[e]();return function(e){return t?n.next():r[e]}},i=function(e,t,r,n,o,a){for(var i=0;i<r||o;){var u=n(i),l=o?u.value:u;if(o&&u.done)return t;t[i]=a?void 0===e?a(l,i):a.call(e,l,i):l,i+=1}if(o)throw new TypeError("Array.from: provided arrayLike or iterator has length more then 2 ** 52 - 1");return t.length=r,t};return function(t){var n=this,u=Object(t),l=r(u[e]);if(null==t&&!l)throw new TypeError("Array.from requires an array-like object or iterator - not null or undefined");var c,d=arguments.length>1?arguments[1]:void 0;if(void 0!==d){if(!r(d))throw new TypeError("Array.from: when provided, the second argument must be a function");arguments.length>2&&(c=arguments[2])}var s=o(u.length),f=r(n)?Object(new n(s)):new Array(s);return i(c,f,s,a(l,u),l,d)}};function o(e){return(o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e})(e)}var a=document.baseURI||window.location.protocol+"//"+window.location.hostname+(window.location.port?":"+window.location.port:"/"),i=document.body.querySelector("form.userform"),u=i.querySelector("button.step-button-save"),l=i.querySelector("button.step-button-next"),c=i.querySelector("a.step-button-share"),d=i.querySelector("[type=submit]"),s=(i.querySelectorAll("button.btn-add-more"),i.querySelectorAll("a.partial-file-remove")),f=i.querySelectorAll("input[type=file]"),p=[],b=function(){var e=new FormData;Array.from(i.querySelectorAll("[name]:not([type=submit])")).forEach(function(t){var r=t.getAttribute("name"),n=function(e,t){var r=e.value;if("select"===e.getAttribute("type"))return e[e.selectedIndex].value;if("radio"===e.getAttribute("type")){var n="[name=".concat(t,"]:checked"),o=document.body.querySelector(n);return null!==o?o.value:""}if("checkbox"===e.getAttribute("type")){var a='[name="'.concat(t,'"]:checked'),i=Array.from(document.body.querySelectorAll(a)),u=[];return i.length>0?(i.forEach(function(e){u.push(e.value)}),u):""}return"file"===e.getAttribute("type")&&e.files.length>0?e.files[0]:r}(t,r);"object"===o(n)&&"file"===t.getAttribute("type")?e.append(r,n):"object"===o(n)?n.forEach(function(t){e.append(r,t)}):e.append(r,n)});var t=new XMLHttpRequest;return t.onreadystatechange=function(){1===t.readyState?(u.setAttribute("disabled","disabled"),d.setAttribute("disabled","disabled")):4===t.readyState&&(u.removeAttribute("disabled"),d.removeAttribute("disabled"),i.classList.remove("dirty"),409===t.status&&alert(t.responseText))},p.push(t),t.open("POST","".concat(a).concat("partialuserform/save"),!0),t.send(e),t},m=function(e,t){var r=t.querySelector("span#".concat(e));if(r)for(;r.firstChild;)r.removeChild(r.lastChild);else(r=document.createElement("span")).setAttribute("id",e),t.appendChild(r);return r.setAttribute("class","right-title"),r},y=function(e){e.preventDefault();var t=e.target,r=new FormData,n=t.parentNode.parentNode,o=t.parentNode.getAttribute("id"),i=t.getAttribute("data-disabled"),u=JSON.parse(t.getAttribute("data-file-remove")),l=m(o,n);if("disabled"===i)return l.appendChild(document.createTextNode("Still in progress...")),void l.setAttribute("class","right-title loading");Object.keys(u).forEach(function(e){r.append(e,u[e])}),t.setAttribute("data-disabled","disabled"),l.appendChild(document.createTextNode("Removing selected file...")),l.setAttribute("class","right-title loading");var c=new XMLHttpRequest;c.onreadystatechange=function(){4===c.readyState&&(409===c.status?alert(c.responseText):(l=m(o,n)).appendChild(document.createTextNode("We accept .png, .jpg and .pdf")))},p.push(c),c.open("POST","".concat(a,"partialuserform/remove-file"),!0),c.send(r)},v=function(e){var t=e.Name,r=document.body.querySelector("[name=".concat(t,"]")).parentNode.parentNode,n=m("".concat(t,"_right_title"),r);n.appendChild(document.createTextNode("View "));var o=document.createElement("a");o.setAttribute("class","external"),o.setAttribute("rel","external"),o.setAttribute("title","Open external link"),o.setAttribute("href",e.Link),o.setAttribute("target","_blank"),o.appendChild(document.createTextNode(e.Title)),n.appendChild(o),n.appendChild(document.createTextNode("  "));var a=document.createElement("a");a.setAttribute("class","partial-file-remove"),a.setAttribute("href","javascript:;"),a.setAttribute("data-disabled",""),a.setAttribute("data-file-remove",'{"PartialID":'.concat(e.PartialID,',"FileID":').concat(e.FileID,"}")),a.appendChild(document.createTextNode("Remove ✗")),a.addEventListener("click",y),n.appendChild(a)},h=function(e){var t=e.target;if(t.value){var r=t.parentNode,n=b(),o=r.parentNode,a=t.getAttribute("name"),i=m("".concat(a,"_right_title"),o);i.appendChild(document.createTextNode("Uploading selected file...")),i.setAttribute("class","right-title loading"),n.onload=function(){if(201==n.status)for(var e=JSON.parse(n.responseText),t=0;t<e.length;t++)e[t].Name===a&&v(e[t]);i.setAttribute("class","right-title")}}},g=function(e){e.preventDefault();var t=e.target,r=b();r.onload=function(){201==r.status&&(document.location.href=t.getAttribute("href"))}};n(),Array.from||(Array.from=n()),function(){if(u&&u.addEventListener("click",b),l&&l.addEventListener("click",b),c&&c.addEventListener("click",g),s.length)for(var e=0;e<s.length;e++)s[e].addEventListener("click",y);if(f.length)for(var t=0;t<f.length;t++)f[t].addEventListener("change",h)}(),null!==i&&(i._submit=i.submit,i.submit=function(){p.length&&p.forEach(function(e){e.abort()}),i._submit()})}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./client/src/js/main.js":
+/*!*******************************!*\
+  !*** ./client/src/js/main.js ***!
+  \*******************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _polyfill_arrayFrom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./polyfill/arrayFrom */ "./client/src/js/polyfill/arrayFrom.js");
+/* harmony import */ var _partialuserforms_partialsubmission__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./partialuserforms/partialsubmission */ "./client/src/js/partialuserforms/partialsubmission.js");
+/* harmony import */ var _partialuserforms_partialstorage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./partialuserforms/partialstorage */ "./client/src/js/partialuserforms/partialstorage.js");
+
+
+
+Object(_polyfill_arrayFrom__WEBPACK_IMPORTED_MODULE_0__["default"])();
+Object(_partialuserforms_partialsubmission__WEBPACK_IMPORTED_MODULE_1__["default"])();
+Object(_partialuserforms_partialstorage__WEBPACK_IMPORTED_MODULE_2__["default"])();
+
+/***/ }),
+
+/***/ "./client/src/js/partialuserforms/partialstorage.js":
+/*!**********************************************************!*\
+  !*** ./client/src/js/partialuserforms/partialstorage.js ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (function () {// @todo, add the option to prefill
+});
+
+/***/ }),
+
+/***/ "./client/src/js/partialuserforms/partialsubmission.js":
+/*!*************************************************************!*\
+  !*** ./client/src/js/partialuserforms/partialsubmission.js ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+var baseDomain = document.baseURI || window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '' + '/');
+var submitURL = 'partialuserform/save';
+var form = document.body.querySelector('form.userform');
+
+var formElements = function formElements() {
+  return Array.from(form.querySelectorAll('[name]:not([type=submit])'));
+};
+
+var saveButton = form.querySelector('button.step-button-save');
+var nextButton = form.querySelector('button.step-button-next');
+var shareButton = form.querySelector('a.step-button-share');
+var submitButton = form.querySelector('[type=submit]');
+var repeatButton = form.querySelectorAll('button.btn-add-more');
+var removeFileButton = form.querySelectorAll('a.partial-file-remove');
+var uploadButtons = form.querySelectorAll('input[type=file]');
+var requests = [];
+
+var getElementValue = function getElementValue(element, fieldName) {
+  var value = element.value;
+
+  if (element.getAttribute('type') === 'select') {
+    return element[element.selectedIndex].value;
+  }
+
+  if (element.getAttribute('type') === 'radio') {
+    var name = "[name=".concat(fieldName, "]:checked");
+    var checkedElement = document.body.querySelector(name);
+    return checkedElement !== null ? checkedElement.value : "";
+  }
+
+  if (element.getAttribute('type') === 'checkbox') {
+    var _name = "[name=\"".concat(fieldName, "\"]:checked");
+
+    var checkedElements = Array.from(document.body.querySelectorAll(_name));
+    var valueArray = [];
+
+    if (checkedElements.length > 0) {
+      checkedElements.forEach(function (element) {
+        valueArray.push(element.value);
+      });
+      return valueArray;
+    }
+
+    return "";
+  }
+
+  if (element.getAttribute('type') === 'file' && element.files.length > 0) {
+    return element.files[0];
+  }
+
+  return value;
+};
+
+var submitPartial = function submitPartial() {
+  // This will trigger recaptcha validation
+  grecaptcha.execute(recaptchaId);
+  var data = new FormData();
+  formElements().forEach(function (element) {
+    var fieldName = element.getAttribute('name');
+    var value = getElementValue(element, fieldName);
+
+    if (_typeof(value) === 'object' && element.getAttribute('type') === 'file') {
+      data.append(fieldName, value);
+    } else if (_typeof(value) === 'object') {
+      value.forEach(function (arrayValue) {
+        data.append(fieldName, arrayValue);
+      });
+    } else {
+      data.append(fieldName, value);
+    }
+  });
+  /** global: XMLHttpRequest */
+
+  var httpRequest = new XMLHttpRequest();
+
+  httpRequest.onreadystatechange = function () {
+    if (httpRequest.readyState === 1) {
+      saveButton.setAttribute('disabled', 'disabled');
+      submitButton.setAttribute('disabled', 'disabled');
+    } else if (httpRequest.readyState === 4) {
+      saveButton.removeAttribute('disabled');
+      submitButton.removeAttribute('disabled');
+      form.classList.remove('dirty');
+
+      if (httpRequest.status === 409) {
+        alert(httpRequest.responseText);
+      }
+    }
+  };
+
+  requests.push(httpRequest);
+  httpRequest.open('POST', "".concat(baseDomain).concat(submitURL), true);
+  httpRequest.send(data);
+  return httpRequest;
+};
+
+var replaceExistingAttribute = function replaceExistingAttribute(dom, attr, previous, latest) {
+  var matches = dom.querySelectorAll("[".concat(attr, "*=").concat(previous));
+  matches.forEach(function (item) {
+    var oldValue = item.getAttribute(attr);
+    var newValue = oldValue.replace(new RegExp(previous), latest);
+    item.setAttribute(attr, newValue);
+  });
+};
+
+var createUploadLinksHolder = function createUploadLinksHolder(name, elementHolder) {
+  var span = elementHolder.querySelector("span#".concat(name));
+
+  if (span) {
+    while (span.firstChild) {
+      span.removeChild(span.lastChild);
+    }
+  } else {
+    span = document.createElement('span');
+    span.setAttribute('id', name);
+    elementHolder.appendChild(span);
+  }
+
+  span.setAttribute('class', 'right-title');
+  return span;
+};
+
+var removePartialFile = function removePartialFile(event) {
+  event.preventDefault();
+  var link = event.target;
+  var form = new FormData();
+  var holder = link.parentNode.parentNode;
+  var name = link.parentNode.getAttribute('id');
+  var disabled = link.getAttribute('data-disabled');
+  var linkData = JSON.parse(link.getAttribute('data-file-remove'));
+  var span = createUploadLinksHolder(name, holder);
+
+  if (disabled === 'disabled') {
+    span.appendChild(document.createTextNode('Still in progress...'));
+    span.setAttribute('class', 'right-title loading');
+    return;
+  }
+
+  Object.keys(linkData).forEach(function (name) {
+    form.append(name, linkData[name]);
+  });
+  link.setAttribute('data-disabled', 'disabled');
+  span.appendChild(document.createTextNode('Removing selected file...'));
+  span.setAttribute('class', 'right-title loading');
+  /** global: XMLHttpRequest */
+
+  var httpRequest = new XMLHttpRequest();
+
+  httpRequest.onreadystatechange = function () {
+    if (httpRequest.readyState === 4) {
+      if (httpRequest.status === 409) {
+        alert(httpRequest.responseText);
+      } else {
+        span = createUploadLinksHolder(name, holder);
+        span.appendChild(document.createTextNode('We accept .png, .jpg and .pdf'));
+      }
+    }
+  };
+
+  requests.push(httpRequest);
+  httpRequest.open('POST', "".concat(baseDomain, "partialuserform/remove-file"), true);
+  httpRequest.send(form);
+};
+
+var createUploadLinks = function createUploadLinks(record) {
+  var name = record['Name'];
+  var field = document.body.querySelector("[name=".concat(name, "]"));
+  var holder = field.parentNode.parentNode;
+  var span = createUploadLinksHolder("".concat(name, "_right_title"), holder);
+  span.appendChild(document.createTextNode('View '));
+  var viewLink = document.createElement('a');
+  viewLink.setAttribute('class', 'external');
+  viewLink.setAttribute('rel', 'external');
+  viewLink.setAttribute('title', 'Open external link');
+  viewLink.setAttribute('href', record['Link']);
+  viewLink.setAttribute('target', '_blank');
+  viewLink.appendChild(document.createTextNode(record['Title']));
+  span.appendChild(viewLink);
+  span.appendChild(document.createTextNode(" \xA0"));
+  var removeLink = document.createElement('a');
+  removeLink.setAttribute('class', 'partial-file-remove');
+  removeLink.setAttribute('href', 'javascript:;');
+  removeLink.setAttribute('data-disabled', '');
+  removeLink.setAttribute('data-file-remove', "{\"PartialID\":".concat(record['PartialID'], ",\"FileID\":").concat(record['FileID'], "}"));
+  removeLink.appendChild(document.createTextNode('Remove ✗'));
+  removeLink.addEventListener('click', removePartialFile);
+  span.appendChild(removeLink);
+};
+
+var uploadPartialHandler = function uploadPartialHandler(event) {
+  var uploadField = event.target;
+
+  if (!uploadField.value) {
+    return;
+  }
+
+  var parentHolder = uploadField.parentNode;
+  var httpRequest = submitPartial();
+  var holder = parentHolder.parentNode;
+  var name = uploadField.getAttribute('name');
+  var span = createUploadLinksHolder("".concat(name, "_right_title"), holder);
+  span.appendChild(document.createTextNode('Uploading selected file...'));
+  span.setAttribute('class', 'right-title loading');
+
+  httpRequest.onload = function () {
+    if (httpRequest.status == 201) {
+      var records = JSON.parse(httpRequest.responseText);
+
+      for (var index = 0; index < records.length; index++) {
+        if (records[index]['Name'] === name) {
+          createUploadLinks(records[index]);
+        }
+      }
+    }
+
+    span.setAttribute('class', 'right-title');
+  };
+};
+
+var sharePartial = function sharePartial(event) {
+  event.preventDefault();
+  var linkTag = event.target;
+  var httpRequest = submitPartial();
+
+  httpRequest.onload = function () {
+    if (httpRequest.status == 201) {
+      document.location.href = linkTag.getAttribute('href');
+    }
+  };
+};
+
+var attachSavePartial = function attachSavePartial() {
+  if (saveButton) {
+    saveButton.addEventListener('click', submitPartial);
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener('click', submitPartial);
+  }
+
+  if (shareButton) {
+    shareButton.addEventListener('click', sharePartial);
+  }
+
+  if (removeFileButton.length) {
+    for (var index = 0; index < removeFileButton.length; index++) {
+      removeFileButton[index].addEventListener('click', removePartialFile);
+    }
+  }
+
+  if (uploadButtons.length) {
+    for (var _index = 0; _index < uploadButtons.length; _index++) {
+      uploadButtons[_index].addEventListener('change', uploadPartialHandler);
+    }
+  }
+};
+
+var abortPendingSubmissions = function abortPendingSubmissions() {
+  // Clear all pending partial submissions on submit
+  if (form !== null) {
+    form._submit = form.submit; // Save reference
+
+    form.submit = function () {
+      // Abort all requests
+      if (requests.length) {
+        requests.forEach(function (xhr) {
+          xhr.abort();
+        });
+      }
+
+      form._submit();
+    };
+  }
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (function () {
+  attachSavePartial();
+  abortPendingSubmissions();
+});
+var recaptchaId = null;
+/*
+  - Function called onload in https://www.google.com/recaptcha/api.js?render=explicit&onload=loadRecaptcha
+  - Above script src added in src/controllers/PartialUserFormController.php
+  - Assumption
+    <div id="g-recaptcha-partial-userform" data-sitekey="$RecaptchaSitekey"></div> tag is present in template
+**/
+
+window.loadRecaptcha = function () {
+  var captchaElement = document.getElementById('g-recaptcha-partial-userform');
+  var captchaOptions = {
+    sitekey: captchaElement.dataset.sitekey,
+    size: 'invisible',
+    callback: handleAction,
+    'expired-callback': function expiredCallback() {
+      alert('Expired reCAPTCHA response and the you will need to re-verify.');
+      return false;
+    }
+  };
+  recaptchaId = grecaptcha.render(captchaElement, captchaOptions);
+}; // reCaptcha callback - Do the main processing here
+
+
+window.handleAction = function () {
+  // if there is no previous reponse then execute recaptcha else do nothing (As we are not processing any form data here, it's done in submitPartial function)
+  grecaptcha.execute(recaptchaId); // Once recaptcha is validated reset recaptcha token for next action captcha validation
+
+  grecaptcha.reset(recaptchaId);
+};
+
+/***/ }),
+
+/***/ "./client/src/js/polyfill/arrayFrom.js":
+/*!*********************************************!*\
+  !*** ./client/src/js/polyfill/arrayFrom.js ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// Production steps of ECMA-262, Edition 6, 22.1.2.1
+var arrayFrom = function arrayFrom() {
+  var symbolIterator;
+
+  try {
+    symbolIterator = Symbol.iterator ? Symbol.iterator : 'Symbol(Symbol.iterator)';
+  } catch (_unused) {
+    symbolIterator = 'Symbol(Symbol.iterator)';
+  }
+
+  var toStr = Object.prototype.toString;
+
+  var isCallable = function isCallable(fn) {
+    return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+  };
+
+  var toInteger = function toInteger(value) {
+    var number = Number(value);
+    if (isNaN(number)) return 0;
+    if (number === 0 || !isFinite(number)) return number;
+    return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+  };
+
+  var maxSafeInteger = Math.pow(2, 53) - 1;
+
+  var toLength = function toLength(value) {
+    var len = toInteger(value);
+    return Math.min(Math.max(len, 0), maxSafeInteger);
+  };
+
+  var setGetItemHandler = function setGetItemHandler(isIterator, items) {
+    var iterator = isIterator && items[symbolIterator]();
+    return function getItem(k) {
+      return isIterator ? iterator.next() : items[k];
+    };
+  };
+
+  var getArray = function getArray(T, A, len, getItem, isIterator, mapFn) {
+    // 16. Let k be 0.
+    var k = 0; // 17. Repeat, while k < len… or while iterator is done (also steps a - h)
+
+    while (k < len || isIterator) {
+      var item = getItem(k);
+      var kValue = isIterator ? item.value : item;
+
+      if (isIterator && item.done) {
+        return A;
+      } else {
+        if (mapFn) {
+          A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+        } else {
+          A[k] = kValue;
+        }
+      }
+
+      k += 1;
+    }
+
+    if (isIterator) {
+      throw new TypeError('Array.from: provided arrayLike or iterator has length more then 2 ** 52 - 1');
+    } else {
+      A.length = len;
+    }
+
+    return A;
+  }; // The length property of the from method is 1.
+
+
+  return function from(arrayLikeOrIterator
+  /*, mapFn, thisArg */
+  ) {
+    // 1. Let C be the this value.
+    var C = this; // 2. Let items be ToObject(arrayLikeOrIterator).
+
+    var items = Object(arrayLikeOrIterator);
+    var isIterator = isCallable(items[symbolIterator]); // 3. ReturnIfAbrupt(items).
+
+    if (arrayLikeOrIterator == null && !isIterator) {
+      throw new TypeError('Array.from requires an array-like object or iterator - not null or undefined');
+    } // 4. If mapfn is undefined, then let mapping be false.
+
+
+    var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+    var T;
+
+    if (typeof mapFn !== 'undefined') {
+      // 5. else
+      // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+      if (!isCallable(mapFn)) {
+        throw new TypeError('Array.from: when provided, the second argument must be a function');
+      } // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+
+
+      if (arguments.length > 2) {
+        T = arguments[2];
+      }
+    } // 10. Let lenValue be Get(items, "length").
+    // 11. Let len be ToLength(lenValue).
+
+
+    var len = toLength(items.length); // 13. If IsConstructor(C) is true, then
+    // 13. a. Let A be the result of calling the [[Construct]] internal method
+    // of C with an argument list containing the single item len.
+    // 14. a. Else, Let A be ArrayCreate(len).
+
+    var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+    return getArray(T, A, len, setGetItemHandler(isIterator, items), isIterator, mapFn);
+  };
+};
+
+var polyfillArrayFrom = function polyfillArrayFrom() {
+  if (!Array.from) {
+    Array.from = arrayFrom();
+  }
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (function () {
+  arrayFrom();
+  polyfillArrayFrom();
+});
+
+/***/ }),
+
+/***/ 0:
+/*!*************************************!*\
+  !*** multi ./client/src/js/main.js ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! /Users/amolw/clients/mbie27/vendor/firesphere/partialuserforms/client/src/js/main.js */"./client/src/js/main.js");
+
+
+/***/ })
+
+/******/ });
