@@ -38,7 +38,7 @@ const hideRepeatGroup = (event) => {
     const destination = mainContainer.querySelector('.repeat-destination');
     const counter = button.getAttribute('data-counter');
     const groupName = button.getAttribute('data-name');
-    const hiddenInput = mainContainer.querySelector(`#${groupName}`);
+    const hiddenInput = mainContainer.querySelector(`input[name="${groupName}"]`);
     const addButtonContainer = hiddenInput.parentNode;
     const values = parseCSV(hiddenInput.value).filter(item => item != counter);
     const resetForm = document.createElement('form');
