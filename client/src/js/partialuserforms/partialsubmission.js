@@ -42,8 +42,11 @@ const getElementValue = (element, fieldName) => {
 };
 
 const submitPartial = () => {
-  // This will trigger recaptcha validation
-  grecaptcha.execute(recaptchaId);
+  // grecaptcha is initialied in src/controllers/PartialUserFormController.php by adding https://www.google.com/recaptcha/api.js
+  // This will trigger recaptcha validation if it's enabled in CMS
+  if (typeof grecaptcha !== 'undefined') {
+    grecaptcha.execute(recaptchaId);
+  }
 
   const data = new FormData();
   formElements().forEach(element => {
