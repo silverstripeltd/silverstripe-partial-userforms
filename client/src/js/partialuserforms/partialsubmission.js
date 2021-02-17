@@ -280,7 +280,7 @@ window.loadRecaptcha = function () {
     size: 'invisible',
     callback: handleAction,
     'expired-callback': function () {
-      alert('Expired reCAPTCHA response and the you will need to re-verify.');
+      alert('Expired reCAPTCHA response; you will need to re-verify.');
       return false;
     },
   };
