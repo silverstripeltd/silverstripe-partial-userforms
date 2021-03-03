@@ -26,13 +26,24 @@ const duplicateFields = (event) => {
 const hideRepeatGroup = (event) => {
     event.preventDefault();
     const button = event.target;
+    const buttonContainer = button.parentNode;
     if (button.getAttribute('data-warned') != 1) {
+      // If repeated fields has values show alert message
+      let hasValues = false;
+      const elements = buttonContainer.querySelectorAll('input, select, textarea');
+      for (count = 0; count < elements.length; count++) {
+        if (elements[count].value) {
+          hasValues = true;
+          break;
+        }
+      }
+      if (hasValues) {
         button.setAttribute('data-warned', 1);
         return window.alert('Before deleting extra field set, make the values are cleared.');
+      }
     }
     button.setAttribute('data-warned', 0);
 
-    const buttonContainer = button.parentNode;
     const mainContainer = buttonContainer.parentNode.parentNode;
     const source = mainContainer.querySelector('.repeat-source');
     const destination = mainContainer.querySelector('.repeat-destination');
