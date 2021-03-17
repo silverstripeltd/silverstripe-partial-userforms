@@ -12,6 +12,10 @@
     border-bottom-width: 3px;
 }
 
+.repeat-group:nth-child(n+2) {
+  border-top: none;
+}
+
 .repeat-group hr {
     margin-top: 0;
     border-top: 1px solid #e2e2e2;

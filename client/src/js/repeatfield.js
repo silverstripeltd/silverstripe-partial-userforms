@@ -32,7 +32,11 @@ const hideRepeatGroup = (event) => {
       let hasValues = false;
       const elements = buttonContainer.querySelectorAll('input, select, textarea');
       for (count = 0; count < elements.length; count++) {
-        if (elements[count].value) {
+        const currentElement = elements[count];
+        if (currentElement.getAttribute('type') == 'hidden') {
+          continue;
+        }
+        if (currentElement.value) {
           hasValues = true;
           break;
         }
