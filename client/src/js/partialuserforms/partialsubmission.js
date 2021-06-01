@@ -1,4 +1,4 @@
-const baseDomain = document.baseURI;
+const baseDomain = window.origin;
 const submitURL = 'partialuserform';
 const buttons = () => Array.from(document.body.querySelectorAll('form.userform ul li.step-button-wrapper button'));
 const formElements = () => Array.from(document.body.querySelectorAll('form.userform [name]'));
@@ -46,7 +46,7 @@ const submitPartial = () => {
   });
   /** global: XMLHttpRequest */
   const httpRequest = new XMLHttpRequest();
-  httpRequest.open('POST', `${baseDomain}${submitURL}`, true);
+  httpRequest.open('POST', `${baseDomain}/${submitURL}`, true);
   httpRequest.send(data);
 };
 
