@@ -2,25 +2,30 @@
 
 namespace Firesphere\PartialUserforms\Models;
 
-use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
-use Firesphere\PartialUserforms\Forms\RepeatField;
 use SilverStripe\Assets\File;
-use SilverStripe\Assets\Upload;
-use SilverStripe\Control\Controller;
 use SilverStripe\Core\Convert;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldAddNewButton;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\Assets\Upload;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\FieldType\DBField;
-use SilverStripe\ORM\FieldType\DBHTMLText;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\ORM\ValidationResult;
-use SilverStripe\UserForms\Model\EditableFormField;
-use SilverStripe\UserForms\Model\EditableFormField\EditableFileField;
 use SilverStripe\View\Requirements;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig;
+use Firesphere\PartialUserforms\Forms\RepeatField;
+use SilverStripe\UserForms\Model\EditableFormField;
+use SilverStripe\Forms\GridField\GridFieldButtonRow;
+use SilverStripe\Forms\GridField\GridFieldPaginator;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Forms\GridField\GridFieldEditButton;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
+use SilverStripe\UserForms\Form\GridFieldAddClassesButton;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
+use Firesphere\PartialUserforms\Models\SubmittedRepeatField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFormStep;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFileField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableTextField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroup;
+use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroupEnd;
 
 class EditableRepeatField extends EditableFormField
 {
@@ -111,14 +116,50 @@ class EditableRepeatField extends EditableFormField
             ]
         );
 
+        $editableColumns = new GridFieldEditableColumns();
+        $fieldClasses = singleton(EditableFormField::class)->getEditableFieldClasses();
+        $editableColumns->setDisplayFields([
+            'ClassName' => function ($record, $column, $grid) use ($fieldClasses) {
+                if ($record instanceof EditableFormField) {
+                    $field = $record->getInlineClassnameField($column, $fieldClasses);
+                    if ($record instanceof EditableFileField) {
+                        $field->setAttribute('data-folderconfirmed', $record->FolderConfirmed ? 1 : 0);
+                    }
+                    return $field;
+                }
+            },
+            'Title' => function ($record, $column, $grid) {
+                if ($record instanceof EditableFormField) {
+                    return $record->getInlineTitleField($column);
+                }
+            }
+        ]);
+
+        $config = GridFieldConfig::create()
+            ->addComponents(
+                $editableColumns,
+                new GridFieldButtonRow(),
+                $addButton = new GridFieldAddClassesButton(EditableTextField::class),
+                $editButton = new GridFieldEditButton(),
+                new GridFieldDeleteAction(),
+                new GridFieldToolbarHeader(),
+                new GridFieldDetailForm(),
+                new GridFieldPaginator(999)
+            );
+
+        $addButton->setButtonName(_t(__CLASS__ . '.ADD_FIELD', 'Add Field'))->setButtonClass('btn-primary');
+        $editButton->removeExtraClass('grid-field__icon-action--hidden-on-hover');
+
+        $fieldEditor = GridField::create(
+            'RepeatFields',
+            'Repeat Fields',
+            $this->Repeats(),
+            $config
+        )->addExtraClass('uf-field-editor');
+
         $fields->addFieldToTab(
             'Root.ChildFields',
-            GridField::create(
-                'RepeatFields',
-                'Repeat Fields',
-                $this->Repeats(),
-                GridFieldConfig_RecordEditor::create()
-            )
+            $fieldEditor
         );
 
         return $fields;
