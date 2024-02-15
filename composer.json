@@ -17,10 +17,10 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
-        "silverstripe/recipe-cms": "^4",
-        "silverstripe/userforms": "^5.4",
-        "symbiote/silverstripe-queuedjobs": "^4.2"
+        "php": ">=8",
+        "silverstripe/recipe-cms": "^5",
+        "silverstripe/userforms": "^6",
+        "symbiote/silverstripe-queuedjobs": "^5"
     },
     "require-dev": {
         "scriptfusion/phpunit-immediate-exception-printer": "^2.0",
