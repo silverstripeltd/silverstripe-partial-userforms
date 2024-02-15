@@ -1,5 +1,4 @@
-const baseDomain = document.baseURI
-    || (window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '' + '/'));
+const baseDomain = window.origin;
 const submitURL = 'partialuserform/save';
 const form = document.body.querySelector('form.userform');
 const formElements = () => Array.from(form.querySelectorAll('[name]:not([type=submit])'));
@@ -81,7 +80,7 @@ const submitPartial = () => {
   };
 
   requests.push(httpRequest);
-  httpRequest.open('POST', `${baseDomain}${submitURL}`, true);
+  httpRequest.open('POST', `${baseDomain}/${submitURL}`, true);
   httpRequest.send(data);
 
   return httpRequest;
