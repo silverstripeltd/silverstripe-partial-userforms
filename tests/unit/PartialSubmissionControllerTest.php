@@ -10,6 +10,7 @@ use SilverStripe\Assets\Upload_Validator;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\UserForms\Model\EditableFormField\EditableFileField;
 use SilverStripe\UserForms\Model\UserDefinedForm;
 
@@ -191,13 +192,8 @@ class PartialSubmissionControllerTest extends FunctionalTest
         $this->assertEquals('Value1, Value2', $field3->Value);
     }
 
-    /**
-     * @todo Remove skip test after implementation
-     */
     public function testSaveDataWithExpiredSession()
     {
-        $this->markTestSkipped('Remove skip test once implementation is complete');
-
         $values = [
             'Field1' => 'Value1',
             'Field2' => 'Value2',
@@ -207,14 +203,37 @@ class PartialSubmissionControllerTest extends FunctionalTest
         $id = $this->savePartial($values);
         $this->assertInternalType('int', $id);
 
-        $partial = PartialFormSubmission::get()->byID($id);
-        $this->assertNotNull($partial);
+        $sessionID = $this->session()->get(PartialSubmissionController::SESSION_KEY);
+        $this->assertEquals($id, $sessionID);
 
-        // Now clear session and save
+        // Now clear session and save, it should be 404
         $this->session()->clear(PartialSubmissionController::SESSION_KEY);
         $values['Field1'] = 'NEW VALUE';
-        $newId = $this->savePartial($values);
-        $this->assertEquals($id, $newId);
+        $response = $this->post('/partialuserform/save', $values);
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+
+    public function testReloadSession()
+    {
+        $sessionID = $this->session()->get(PartialSubmissionController::SESSION_KEY);
+        $this->assertNotEmpty($sessionID);
+
+        $partial = PartialFormSubmission::get()->byID($sessionID);
+        $this->assertNull($partial->LockedOutUntil);
+        $this->assertNull($partial->PHPSessionID);
+
+        $this->session()->clear(PartialSubmissionController::SESSION_KEY);
+        $sessionID = $this->session()->get(PartialSubmissionController::SESSION_KEY);
+        $this->assertNull($sessionID);
+
+        // New session
+        session_id('petrichor');
+        DBDatetime::set_mock_now('2019-02-15 10:00:00');
+        $id = $this->savePartial(['PartialID' => 1]); // save submission reloads the session
+        $partial = PartialFormSubmission::get()->byID($id);
+
+        $this->assertEquals('2019-02-15 10:30:00', $partial->LockedOutUntil);
+        $this->assertEquals('petrichor', $partial->PHPSessionID);
     }
 
     /**
@@ -233,7 +252,26 @@ class PartialSubmissionControllerTest extends FunctionalTest
     public function setUp()
     {
         parent::setUp();
-        $this->objFromFixture(UserDefinedForm::class, 'form1')->publishRecursive();
+        $udf = $this->objFromFixture(UserDefinedForm::class, 'form1');
+        $udf->publishRecursive();
         $this->controller = Injector::inst()->get(PartialSubmissionController::class);
+
+        // Since parent is now created in UDF / Partial controllers, let's just set the parent here
+        $partialID = PartialFormSubmission::create([
+            'UserDefinedFormID'     => $udf->ID,
+            'UserDefinedFormClass'  => $udf->ClassName,
+            'ParentClass'           => $udf->ClassName,
+            'ParentID'              => $udf->ID,
+        ])->write();
+        $this->session()->set(PartialSubmissionController::SESSION_KEY, $partialID);
+    }
+
+    public function tearDown()
+    {
+        if (session_id()) {
+            // Set the session back to empty string to prevent destroying uninitialized session
+            session_id('');
+        }
+        parent::tearDown();
     }
 }

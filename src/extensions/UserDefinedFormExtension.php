@@ -2,16 +2,19 @@
 
 namespace Firesphere\PartialUserforms\Extensions;
 
-use Firesphere\PartialUserforms\Models\PartialFormSubmission;
-use SilverStripe\Forms\CheckboxField;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldAddNewButton;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\Tab;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataList;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\TextareaField;
+use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\UserForms\Model\UserDefinedForm;
+use SilverStripe\Forms\HTMLEditor\HtmlEditorField;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use Firesphere\PartialUserforms\Models\PartialFormSubmission;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 
 /**
  * Class UserDefinedFormExtension
@@ -28,8 +31,16 @@ class UserDefinedFormExtension extends DataExtension
      * @var array
      */
     private static $db = [
+        'EnablePartialSubmissions' => 'Boolean(false)',
         'ExportPartialSubmissions' => 'Boolean(true)',
-        'PasswordProtected'        => 'Boolean(false)'
+        'PasswordProtected'        => 'Boolean(false)',
+        'FormIntroduction'         => 'HTMLText',
+        'FormOverview'             => 'HTMLText',
+        'SaveOnlyLabel'            => 'Varchar(50)',
+        'SaveAndLogoutLabel'       => 'Varchar(50)',
+        'ShowSubmissionSummary'    => 'Boolean(false)',
+        'EnableRecaptcha'          => 'Boolean(false)',
+        'SaveAndLogoutMessage'     => 'Text',
     ];
 
     /**
@@ -65,35 +76,71 @@ class UserDefinedFormExtension extends DataExtension
             GridField::create(
                 'PartialSubmissions',
                 _t(__CLASS__ . '.PartialSubmission', 'Partial submissions'),
-                $this->owner->PartialSubmissions(),
+                $this->owner->PartialSubmissions()->sort('Created', 'DESC'),
                 $gridfieldConfig
             )
         );
 
-        $fields->insertBefore(
-            'DisableSaveSubmissions',
-            $pwdCheckbox = CheckboxField::create(
-                'PasswordProtected',
-                _t(__CLASS__ . 'PasswordProtected', 'Password protect resuming partial submissions')
-            )
-        );
-        $pwdDescription = _t(
+        $enablePartialCheckbox = CheckboxField::create(
+            'EnablePartialSubmissions',
+            _t(__CLASS__ . '.enablePartialSubmissionsCheckboxLabel', 'Enable partial submissions')
+        )->setDescription(_t(
+            __CLASS__ . '.enablePartialSubmissionsDescription',
+            'If checked, this will allow this form to be shareable and filled out by multiple people'
+        ));
+
+        $pwdCheckbox = CheckboxField::create(
+            'PasswordProtected',
+            _t(__CLASS__ . 'PasswordProtected', 'Password protect resuming partial submissions')
+        )->setDescription(_t(
             __CLASS__ . '.PasswordProtectDescription',
             'When resuming a partial submission, require the user to enter a password'
-        );
-        $pwdCheckbox->setDescription($pwdDescription);
+        ));
 
-        $fields->insertAfter(
-            'DisableSaveSubmissions',
-            $partialCheckbox = CheckboxField::create(
-                'ExportPartialSubmissions',
-                _t(__CLASS__ . '.partialCheckboxLabel', 'Send partial submissions')
-            )
-        );
-        $description = _t(
+        $partialCheckbox = CheckboxField::create(
+            'ExportPartialSubmissions',
+            _t(__CLASS__ . '.partialCheckboxLabel', 'Send partial submissions')
+        )->setDescription(_t(
             __CLASS__ . '.partialCheckboxDescription',
             'The configuration and global export configuration can be set in the site Settings'
+        ));
+
+        $enableRecaptcha = CheckboxField::create(
+            'EnableRecaptcha',
+            _t(__CLASS__ . '.enableRecaptchaLabel', 'Enable Invisible ReCAPTCHA')
+        )->setDescription(_t(
+            __CLASS__ . '.enableRecaptchaDescription',
+            'ReCAPTCHA will be triggered on File upload & Submit,Share or Save button click'
+        ));
+
+        $introTextDescription = _t(__CLASS__ . '.introTextDescription', 'Text to display at the introduction page, before the user has started the form.');
+        $overviewTextDescription = _t(__CLASS__ . '.overviewTextDescription', 'Text to display on the overview page of the form, alongside form credentials.');
+        $saveAndLogoutDescription = _t(
+            __CLASS__ . '.overviewSaveAndLogout',
+            'Text to display on the overview page of the form after Save and logout.'
         );
-        $partialCheckbox->setDescription($description);
+
+        $fields->addFieldToTab(
+            'Root.FormOptions',
+            Tab::create('Partial', _t(__CLASS__ . '.partialTab', 'Partial'))
+        );
+        $fields->addFieldsToTab('Root.FormOptions.Partial', [
+            $enablePartialCheckbox,
+            $pwdCheckbox,
+            $partialCheckbox,
+            $enableRecaptcha,
+            HtmlEditorField::create('FormIntroduction', 'Form introduction text')
+                ->setDescription($introTextDescription)
+                ->setRows(3),
+            HtmlEditorField::create('FormOverview', 'Form overview text')
+                ->setDescription($overviewTextDescription)
+                ->setRows(3),
+            TextField::create('SaveOnlyLabel', 'Save only Label'),
+            TextField::create('SaveAndLogoutLabel', 'Save and logout Label'),
+            CheckboxField::create('ShowSubmissionSummary', 'Show form Submission Summary'),
+            TextareaField::create('SaveAndLogoutMessage', 'Save and logout message')
+                ->setDescription($saveAndLogoutDescription)
+                ->setRows(3),
+        ]);
     }
 }
