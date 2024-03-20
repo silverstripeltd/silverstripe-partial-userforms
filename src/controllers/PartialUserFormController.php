@@ -211,7 +211,7 @@ class PartialUserFormController extends UserDefinedFormController
                 $linkTag,
                 Convert::raw2att($file->AbsoluteLink()),
                 Convert::raw2att($file->Name),
-                Convert::raw2json($fileAttributes)
+                json_encode($fileAttributes)
             );
             $inputField = $fields->dataFieldByName($upload->Name);
             if ($inputField) {
