@@ -20,7 +20,7 @@
                 </button>
             </li>
             <li class="step-button-wrapper">
-                <a href="{$Controller.Link}overview" class="step-button-share">
+                <a href="{$Controller.Link}/overview" class="step-button-share">
                     <% if $Controller.SaveAndLogoutLabel %>
                         $Controller.SaveAndLogoutLabel
                     <% else %>
