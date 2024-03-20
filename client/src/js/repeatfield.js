@@ -111,10 +111,12 @@ const initialiseRepeatedFields = (repeatButton) => {
             }
 
             let clonedField = source.querySelector(`#${index}${counter}`);
-            groupContainer.appendChild(clonedField);
-            if (i > 0) {
+            if (clonedField) {
+              groupContainer.appendChild(clonedField);
+              if (i > 0) {
                 let deleteButton = groupContainer.querySelector('.delete-repeat-group');
                 deleteButton.insertAdjacentElement('beforebegin', clonedField);
+              }
             }
         }
     });
