@@ -149,7 +149,7 @@ const removePartialFile = (event) => {
   };
 
   requests.push(httpRequest);
-  httpRequest.open('POST', `${baseDomain}partialuserform/remove-file`, true);
+  httpRequest.open('POST', `${baseDomain}/partialuserform/remove-file`, true);
   httpRequest.send(form);
 };
 
