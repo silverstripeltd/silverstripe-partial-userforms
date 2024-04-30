@@ -16,17 +16,12 @@ use SilverStripe\Versioned\Versioned;
 class PartialFileDownloadController extends UserDefinedFormController
 {
     use PartialSubmissionValidationTrait;
-    /**
-     * @var array
-     */
-    private static $url_handlers = [
-        '$Key/$Token/$ID' => 'partialfiledownload',
+
+    private static array $url_handlers = [
+        '$Key/$Token/$FieldName' => 'partialfiledownload',
     ];
 
-    /**
-     * @var array
-     */
-    private static $allowed_actions = [
+    private static array $allowed_actions = [
         'partialfiledownload',
     ];
 
@@ -44,37 +39,37 @@ class PartialFileDownloadController extends UserDefinedFormController
         // Check if form is locked
         if (static::isLockedOut()) {
             return $this->redirect($page->link('overview'));
-        } else {
-            // Claim the form session
-            PartialSubmissionController::reloadSession($request->getSession(), $partial->ID);
         }
+
+        // Claim the form session
+        PartialSubmissionController::reloadSession($request->getSession(), $partial->ID);
 
         $fieldName = $request->param('FieldName');
 
         // Files are stored in draft state for security reasons.
         // At this point the partial form submission session has been validated, we can safely retrieve the file now
         // by temporarily forcing the draft state
-        $upload =  Versioned::withVersionedMode(function () use ($fieldName, $partial) {
+        $uploadField = Versioned::withVersionedMode(function () use ($fieldName, $partial) {
             Versioned::set_stage(Versioned::DRAFT);
 
             return $partial->PartialUploads()->filter(['Name' => $fieldName])->first();
         });
 
 
-        if (!$upload) {
+        if (!$uploadField) {
             return $this->httpError(404);
         }
 
-        $file = $upload->UploadedFile();
+        $file = $uploadField->UploadedFile();
 
         $filesize = $file->getAbsoluteSize();
         $mime = $file->getMimeType();
         $stream = $file->getStream();
 
-        if ($stream != null || gettype($stream) == "resource") {
+        if ($stream !== null || gettype($stream) === "resource") {
             header('Content-Type: ' . $mime);
             header('Content-Length: ' . $filesize, false);
-            if (!empty($mime) && $mime != "text/html") {
+            if (!empty($mime) && $mime !== "text/html") {
                 header('Content-Disposition: inline; filename="' . $file->Name . '"');
             }
             header('Content-transfer-encoding: 8bit');

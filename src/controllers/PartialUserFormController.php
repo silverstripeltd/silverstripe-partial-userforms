@@ -3,11 +3,11 @@
 namespace Firesphere\PartialUserforms\Controllers;
 
 use Exception;
+use Firesphere\PartialUserforms\Forms\PasswordForm;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use Firesphere\PartialUserforms\traits\PartialSubmissionValidationTrait;
-use SilverStripe\Control\HTTPRequest;
-use Firesphere\PartialUserforms\Forms\PasswordForm;
 use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Core\Convert;
@@ -27,6 +27,7 @@ use SilverStripe\View\Requirements;
 class PartialUserFormController extends UserDefinedFormController
 {
     use PartialSubmissionValidationTrait;
+
     /**
      * @var array
      */
@@ -102,15 +103,15 @@ class PartialUserFormController extends UserDefinedFormController
                 );
 
                 return $controller->customise([
-                    'Content'     => DBField::create_field('HTMLText', $content),
-                    'Form'        => ''
+                    'Content' => DBField::create_field('HTMLText', $content),
+                    'Form' => ''
                 ]);
             }
         }
 
         return $controller->customise([
-            'Content'     => DBField::create_field('HTMLText', $controller->Content),
-            'Form'        => $form
+            'Content' => DBField::create_field('HTMLText', $controller->Content),
+            'Form' => $form
         ]);
     }
 
@@ -133,25 +134,25 @@ class PartialUserFormController extends UserDefinedFormController
         );
 
         // Populate files
-        $uploads = $partial->PartialUploads()->filter([
-            'UploadedFileID:not'=> 0
+        $uploadFields = $partial->PartialUploads()->filter([
+            'UploadedFileID:not' => 0
         ]);
 
-        if (!$uploads->exists()) {
+        if (!$uploadFields->exists()) {
             return;
         }
 
-        foreach ($uploads as $upload) {
+        foreach ($uploadFields as $uploadField) {
             $request = $this->getRequest();
-            $file = $upload->UploadedFile();
+            $file = $uploadField->UploadedFile();
             $fileAttributes = ['PartialID' => $partial->ID, 'FileID' => $file->ID];
 
             // Generate a unique download path that is specific to the current session, partial submission and field
             $linkSrc = sprintf(
                 'partialfiledownload/%s/%s/%s',
                 $request->param('Key'),
-            $request->param('Token'),
-            $upload->Name
+                $request->param('Token'),
+                $uploadField->Name
             );
 
             $linkTag = 'View <a href="%s" target="_blank">%s</a> &nbsp;
@@ -162,7 +163,7 @@ class PartialUserFormController extends UserDefinedFormController
                 Convert::raw2att($file->Name),
                 json_encode($fileAttributes)
             );
-            $inputField = $fields->dataFieldByName($upload->Name);
+            $inputField = $fields->dataFieldByName($uploadField->Name);
             if ($inputField) {
                 $inputField->setRightTitle(DBField::create_field('HTMLText', $fileLink))
                     ->removeExtraClass('requiredField')
