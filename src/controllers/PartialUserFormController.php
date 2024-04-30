@@ -3,14 +3,13 @@
 namespace Firesphere\PartialUserforms\Controllers;
 
 use Exception;
-use Firesphere\PartialUserforms\Models\PartialFormSubmission;
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPRequest;
 use Firesphere\PartialUserforms\Forms\PasswordForm;
+use Firesphere\PartialUserforms\Models\PartialFormSubmission;
+use Firesphere\PartialUserforms\traits\PartialSubmissionValidationTrait;
 use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\HTTPResponse_Exception;
-use SilverStripe\Control\Middleware\HTTPCacheControlMiddleware;
 use SilverStripe\Core\Convert;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\HiddenField;
@@ -27,6 +26,8 @@ use SilverStripe\View\Requirements;
  */
 class PartialUserFormController extends UserDefinedFormController
 {
+    use PartialSubmissionValidationTrait;
+
     /**
      * @var array
      */
@@ -102,77 +103,16 @@ class PartialUserFormController extends UserDefinedFormController
                 );
 
                 return $controller->customise([
-                    'Content'     => DBField::create_field('HTMLText', $content),
-                    'Form'        => ''
+                    'Content' => DBField::create_field('HTMLText', $content),
+                    'Form' => ''
                 ]);
             }
         }
 
         return $controller->customise([
-            'Content'     => DBField::create_field('HTMLText', $controller->Content),
-            'Form'        => $form
+            'Content' => DBField::create_field('HTMLText', $controller->Content),
+            'Form' => $form
         ]);
-    }
-
-
-    /**
-     * A little abstraction to be more readable
-     * @param HTTPRequest $request
-     * @return PartialFormSubmission|void
-     * @throws HTTPResponse_Exception
-     * @throws \SilverStripe\ORM\ValidationException
-     */
-    public function validateToken($request)
-    {
-        // Ensure this URL doesn't get picked up by HTTP caches
-        HTTPCacheControlMiddleware::singleton()->disableCache();
-
-        $key = $request->param('Key');
-        $token = $request->param('Token');
-        if (!$key || !$token) {
-            return $this->httpError(404);
-        }
-
-        /** @var PartialFormSubmission $partial */
-        $partial = PartialFormSubmission::validateKeyToken($key, $token);
-        if ($partial === false) {
-            return $this->httpError(404);
-        }
-
-        // Reload session by checking if the last session has expired
-        // or another submission has started
-        $sessionID = $request->getSession()->get(PartialSubmissionController::SESSION_KEY);
-        if (!$sessionID || $sessionID !== $partial->ID) {
-            PartialSubmissionController::reloadSession($request->getSession(), $partial->ID);
-        }
-
-        return $partial;
-    }
-
-    /**
-     * Checks whether this form is currently being used by someone else
-     * @return bool
-     */
-    public static function isLockedOut()
-    {
-        $session = Controller::curr()->getRequest()->getSession();
-        $submissionID = $session->get(PartialSubmissionController::SESSION_KEY);
-        $partial = PartialFormSubmission::get()->byID($submissionID);
-        $phpSessionID = session_id();
-
-        // If invalid sessions or if the last session was from the same user or that the recent session has expired
-        if (
-            !$submissionID
-            || !$partial
-            || !$partial->PHPSessionID
-            || ($partial->LockedOutUntil && $partial->dbObject('LockedOutUntil')->InPast())
-            || $phpSessionID === $partial->PHPSessionID
-        ) {
-            return false;
-        }
-
-        // Lockout when there's an ongoing session
-        return $partial->LockedOutUntil && $partial->dbObject('LockedOutUntil')->InFuture();
     }
 
     /**
@@ -194,26 +134,36 @@ class PartialUserFormController extends UserDefinedFormController
         );
 
         // Populate files
-        $uploads = $partial->PartialUploads()->filter([
-            'UploadedFileID:not'=> 0
+        $uploadFields = $partial->PartialUploads()->filter([
+            'UploadedFileID:not' => 0
         ]);
 
-        if (!$uploads->exists()) {
+        if (!$uploadFields->exists()) {
             return;
         }
 
-        foreach ($uploads as $upload) {
-            $file = $upload->UploadedFile();
+        foreach ($uploadFields as $uploadField) {
+            $request = $this->getRequest();
+            $file = $uploadField->UploadedFile();
             $fileAttributes = ['PartialID' => $partial->ID, 'FileID' => $file->ID];
+
+            // Generate a unique download path that is specific to the current session, partial submission and field
+            $linkSrc = sprintf(
+                'partialfiledownload/%s/%s/%s',
+                $request->param('Key'),
+                $request->param('Token'),
+                $uploadField->Name
+            );
+
             $linkTag = 'View <a href="%s" target="_blank">%s</a> &nbsp;
                 <a class="partial-file-remove" href="javascript:;" data-disabled="" data-file-remove=\'%s\'>Remove &cross;</a>';
             $fileLink = sprintf(
                 $linkTag,
-                Convert::raw2att($file->AbsoluteLink()),
+                $linkSrc,
                 Convert::raw2att($file->Name),
                 json_encode($fileAttributes)
             );
-            $inputField = $fields->dataFieldByName($upload->Name);
+            $inputField = $fields->dataFieldByName($uploadField->Name);
             if ($inputField) {
                 $inputField->setRightTitle(DBField::create_field('HTMLText', $fileLink))
                     ->removeExtraClass('requiredField')
