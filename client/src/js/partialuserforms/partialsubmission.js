@@ -154,6 +154,8 @@ const removePartialFile = (event) => {
 };
 
 const createUploadLinks = (record) => {
+  let linkHref = `${window.location}/${record.Name}`;
+  linkHref = linkHref.replace('partial/', 'partialfiledownload/');
   const name = record['Name'];
   const field = document.body.querySelector(`[name=${name}]`);
   const holder = field.parentNode.parentNode;
@@ -165,7 +167,7 @@ const createUploadLinks = (record) => {
   viewLink.setAttribute('class', 'external');
   viewLink.setAttribute('rel', 'external');
   viewLink.setAttribute('title', 'Open external link');
-  viewLink.setAttribute('href', record['Link']);
+  viewLink.setAttribute('href', linkHref);
   viewLink.setAttribute('target', '_blank');
   viewLink.appendChild(document.createTextNode(record['Title']));
   span.appendChild(viewLink);

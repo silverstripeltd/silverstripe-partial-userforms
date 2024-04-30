@@ -203,13 +203,23 @@ class PartialUserFormController extends UserDefinedFormController
         }
 
         foreach ($uploads as $upload) {
+            $request = $this->getRequest();
             $file = $upload->UploadedFile();
             $fileAttributes = ['PartialID' => $partial->ID, 'FileID' => $file->ID];
+
+            // Generate a unique download path that is specific to the current session, partial submission and field
+            $linkSrc = sprintf(
+                'partialfiledownload/%s/%s/%s',
+                $request->param('Key'),
+            $request->param('Token'),
+            $upload->Name
+            );
+
             $linkTag = 'View <a href="%s" target="_blank">%s</a> &nbsp;
                 <a class="partial-file-remove" href="javascript:;" data-disabled="" data-file-remove=\'%s\'>Remove &cross;</a>';
             $fileLink = sprintf(
                 $linkTag,
-                Convert::raw2att($file->AbsoluteLink()),
+                $linkSrc,
                 Convert::raw2att($file->Name),
                 json_encode($fileAttributes)
             );
