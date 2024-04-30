@@ -15,6 +15,7 @@ use SilverStripe\Versioned\Versioned;
  */
 class PartialFileDownloadController extends UserDefinedFormController
 {
+
     use PartialSubmissionValidationTrait;
 
     private static array $url_handlers = [
@@ -24,7 +25,6 @@ class PartialFileDownloadController extends UserDefinedFormController
     private static array $allowed_actions = [
         'partialfiledownload',
     ];
-
 
     /**
      * Form users should be able to download files already attached to the form even though the files are in
@@ -55,7 +55,6 @@ class PartialFileDownloadController extends UserDefinedFormController
             return $partial->PartialUploads()->filter(['Name' => $fieldName])->first();
         });
 
-
         if (!$uploadField) {
             return $this->httpError(404);
         }
@@ -66,26 +65,31 @@ class PartialFileDownloadController extends UserDefinedFormController
         $mime = $file->getMimeType();
         $stream = $file->getStream();
 
-        if ($stream !== null || gettype($stream) === "resource") {
-            header('Content-Type: ' . $mime);
-            header('Content-Length: ' . $filesize, false);
-            if (!empty($mime) && $mime !== "text/html") {
-                header('Content-Disposition: inline; filename="' . $file->Name . '"');
-            }
-            header('Content-transfer-encoding: 8bit');
-            header('Expires: 0');
-            header('Pragma: cache');
-            header('Cache-Control: private');
-
-
-            while (ob_get_level() > 0) {
-                ob_end_clean();
-            }
-            flush();
-
-            //Actually output the file stream
-            rewind($stream);
-            fpassthru($stream);
+        if ($stream === null && gettype($stream) !== 'resource') {
+            return $this->httpError(404);
         }
+
+        header('Content-Type: ' . $mime);
+        header('Content-Length: ' . $filesize, false);
+
+        if (!empty($mime) && $mime !== 'text/html') {
+            header('Content-Disposition: inline; filename="' . $file->Name . '"');
+        }
+
+        header('Content-transfer-encoding: 8bit');
+        header('Expires: 0');
+        header('Pragma: cache');
+        header('Cache-Control: private');
+
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        flush();
+
+        //Actually output the file stream
+        rewind($stream);
+        fpassthru($stream);
     }
+
 }
