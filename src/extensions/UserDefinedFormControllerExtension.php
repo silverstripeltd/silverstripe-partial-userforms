@@ -2,27 +2,27 @@
 
 namespace Firesphere\PartialUserforms\Extensions;
 
-use Page;
-use SilverStripe\Forms\Form;
-use SilverStripe\Core\Extension;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\TextField;
-use SilverStripe\Forms\FormAction;
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPRequest;
-use Firesphere\PartialUserforms\Models\PartialFormSubmission;
-use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\UserForms\Control\UserDefinedFormController;
-use Firesphere\PartialUserforms\Models\PartialFieldSubmission;
-use Firesphere\PartialUserforms\Models\PartialFileFieldSubmission;
-use SilverStripe\UserForms\Model\EditableFormField\EditableFormStep;
-use SilverStripe\UserForms\Model\EditableFormField\EditableFileField;
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
+use Firesphere\PartialUserforms\Controllers\PartialUserFormController;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormVerifyController;
 use Firesphere\PartialUserforms\Forms\PasswordForm;
-use Firesphere\PartialUserforms\Controllers\PartialUserFormController;
-use SilverStripe\UserForms\Model\EditableFormField;
+use Firesphere\PartialUserforms\Models\PartialFieldSubmission;
+use Firesphere\PartialUserforms\Models\PartialFileFieldSubmission;
+use Firesphere\PartialUserforms\Models\PartialFormSubmission;
+use Page;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Extension;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\UserForms\Control\UserDefinedFormController;
+use SilverStripe\UserForms\Model\EditableFormField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFileField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFormStep;
 use SilverStripe\UserForms\Model\Submission\SubmittedFormField;
 
 /**
@@ -57,10 +57,10 @@ class UserDefinedFormControllerExtension extends Extension
         $page = $this->owner;
         // Create partial form
         $partialSubmission = PartialFormSubmission::create([
-            'ParentID'              => $page->ID,
-            'ParentClass'           => $page->ClassName,
-            'UserDefinedFormID'     => $page->ID,
-            'UserDefinedFormClass'  => $page->ClassName,
+            'ParentID' => $page->ID,
+            'ParentClass' => $page->ClassName,
+            'UserDefinedFormID' => $page->ID,
+            'UserDefinedFormClass' => $page->ClassName,
         ]);
         $submissionID = $partialSubmission->write();
 
@@ -72,9 +72,9 @@ class UserDefinedFormControllerExtension extends Extension
             }
 
             $newData = [
-                'SubmittedFormID'   => $submissionID,
-                'Name'              => $field->Name,
-                'Title'             => $field->Title ?? $field->Name,
+                'SubmittedFormID' => $submissionID,
+                'Name' => $field->Name,
+                'Title' => $field->Title ?? $field->Name,
             ];
 
             if (in_array(EditableFileField::class, $field->getClassAncestry())) {
@@ -212,7 +212,7 @@ class UserDefinedFormControllerExtension extends Extension
         return $this->owner->customise([
             'Form' => $form,
             'FormLocked' => $formLocked,
-            'HasFormSaved' => (boolean) $hasFormSaved,
+            'HasFormSaved' => (boolean)$hasFormSaved,
             'PartialForm' => $this->getPartialFormSubmission(),
         ]);
     }
@@ -293,8 +293,9 @@ class UserDefinedFormControllerExtension extends Extension
 
     /**
      * Share link from session
-     * Template helper @see UserFormStepNav.ss
+     * Template helper
      * @return void|string URL
+     * @see UserFormStepNav.ss
      */
     public function getShareLink()
     {
@@ -406,8 +407,7 @@ class UserDefinedFormControllerExtension extends Extension
             if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFileField") {
                 $fieldsList->add([
                     'FieldTitle' => $formField->Title ?? "Field Generic",
-                    // 'FieldValue' => $submission->getFileName(),  <--- Show filename - TBD
-                    'FieldValue' =>  $submission->getFileName() ? 'File uploaded' : '',
+                    'FieldValue' => $submission->getFileName(),
                     'FieldClassName' => $formField->ClassName,
                 ]);
                 $_fields++;
