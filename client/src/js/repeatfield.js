@@ -31,7 +31,7 @@ const hideRepeatGroup = (event) => {
       // If repeated fields has values show alert message
       let hasValues = false;
       const elements = buttonContainer.querySelectorAll('input, select, textarea');
-      for (count = 0; count < elements.length; count++) {
+      for (let count = 0; count < elements.length; count++) {
         const currentElement = elements[count];
         if (currentElement.getAttribute('type') == 'hidden') {
           continue;

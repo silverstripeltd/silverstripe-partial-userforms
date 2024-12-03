@@ -16,3 +16,7 @@ SilverStripe\UserForms\Model\Submission\SubmittedFileField:
 SilverStripe\UserForms\Model\EditableFormField\EditableFileField:
   extensions:
     - Firesphere\PartialUserforms\Extensions\EditableFileFieldExtension
+
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\UserForms\Form\UserFormsRequiredFields:
+    class: Firesphere\PartialUserforms\Extensions\UserFormsRequiredFieldsExtension

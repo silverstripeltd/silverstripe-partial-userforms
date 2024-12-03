@@ -92,14 +92,14 @@ class PartialUserFormController extends UserDefinedFormController
 
         // Copied from {@link UserDefinedFormController}
         if ($controller->Content && $form && !$controller->config()->disable_form_content_shortcode) {
-            $hasLocation = stristr($controller->Content, '$UserDefinedForm');
+            $hasLocation = stristr($controller->Content ?? '', '$UserDefinedForm');
             if ($hasLocation) {
                 /** @see Requirements_Backend::escapeReplacement */
-                $formEscapedForRegex = addcslashes($form->forTemplate(), '\\$');
+                $formEscapedForRegex = addcslashes($form->forTemplate() ?? '', '\\$');
                 $content = preg_replace(
                     '/(<p[^>]*>)?\\$UserDefinedForm(<\\/p>)?/i',
-                    $formEscapedForRegex,
-                    $controller->Content
+                    $formEscapedForRegex ?? '',
+                    $controller->Content ?? ''
                 );
 
                 return $controller->customise([
@@ -167,6 +167,7 @@ class PartialUserFormController extends UserDefinedFormController
             if ($inputField) {
                 $inputField->setRightTitle(DBField::create_field('HTMLText', $fileLink))
                     ->removeExtraClass('requiredField')
+                    ->setAttribute('required', false)
                     ->setAttribute('data-rule-required', 'false')
                     ->setAttribute('aria-required', 'false');
             }
