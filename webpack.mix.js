@@ -20,3 +20,5 @@ mix.options({
 });
 
 mix.js(SRC.js, DEST.js);
+mix.js(SRC.repeatfield, DEST.js);
+mix.copy(SRC.onreadyjs, DEST.js);

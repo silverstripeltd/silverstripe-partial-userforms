@@ -3,19 +3,21 @@
 namespace Firesphere\PartialUserforms\Controllers;
 
 use Exception;
-use Firesphere\PartialUserforms\Models\PartialFormSubmission;
-use Page;
-use SilverStripe\Control\HTTPRequest;
 use Firesphere\PartialUserforms\Forms\PasswordForm;
+use Firesphere\PartialUserforms\Models\PartialFormSubmission;
+use Firesphere\PartialUserforms\traits\PartialSubmissionValidationTrait;
+use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\HTTPResponse_Exception;
-use SilverStripe\Control\Middleware\HTTPCacheControlMiddleware;
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\Form;
-use SilverStripe\ORM\DataObject;
+use SilverStripe\Forms\HiddenField;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\UserForms\Control\UserDefinedFormController;
-use SilverStripe\UserForms\Model\UserDefinedForm;
+use SilverStripe\UserForms\Form\UserForm;
+use SilverStripe\View\Requirements;
 
 /**
  * Class PartialUserFormController
@@ -24,22 +26,21 @@ use SilverStripe\UserForms\Model\UserDefinedForm;
  */
 class PartialUserFormController extends UserDefinedFormController
 {
+    use PartialSubmissionValidationTrait;
+
     /**
      * @var array
      */
     private static $url_handlers = [
         '$Key/$Token' => 'partial',
     ];
+
     /**
      * @var array
      */
     private static $allowed_actions = [
         'partial',
     ];
-    /**
-     * @var PartialFormSubmission
-     */
-    protected $partialFormSubmission;
 
     /**
      * Partial form
@@ -53,99 +54,123 @@ class PartialUserFormController extends UserDefinedFormController
     {
         /** @var PartialFormSubmission $partial */
         $partial = $this->validateToken($request);
-        $record = DataObject::get_by_id($partial->UserDefinedFormClass, $partial->UserDefinedFormID);
-        /** @var self $controller */
-        $controller = self::create($record);
-        $controller->doInit();
-        $controller->dataRecord = $record;
-        if ($controller->data()->PasswordProtected &&
-            $request->getSession()->get(PasswordForm::PASSWORD_SESSION_KEY) !== $partial->ID
-        ) {
-            return $this->redirect('verify');
+        $page = $partial->UserDefinedForm();
+
+        // Check if form is locked
+        if (static::isLockedOut()) {
+            return $this->redirect($page->link('overview'));
+        } else {
+            // Claim the form session
+            PartialSubmissionController::reloadSession($request->getSession(), $partial->ID);
         }
 
-        /** @var Form $form */
+        /** @var self $controller */
+        $controller = parent::create($page);
+        $controller->doInit();
+
+        Director::set_current_page($controller->data());
+
+        // Verify user
+        if ($controller->PasswordProtected &&
+            $request->getSession()->get(PasswordForm::PASSWORD_SESSION_KEY) !== $partial->ID
+        ) {
+            return $this->redirect($page->link('verify'));
+        }
+
+        // Add required javascripts
+        Requirements::javascript('firesphere/partialuserforms:client/dist/main.js');
+        Requirements::javascript('firesphere/partialuserforms:client/dist/onready.js');
+
+        if ($page->EnableRecaptcha) {
+            Requirements::javascript('https://www.google.com/recaptcha/api.js?render=explicit&onload=loadRecaptcha');
+        }
+
+        /** @var UserForm $form */
         $form = $controller->Form();
-        $fields = $partial->PartialFields()->map('Name', 'Value')->toArray();
-        $form->loadDataFrom($fields);
+        $form->loadDataFrom($partial->getFields());
+        $this->populateData($form, $partial);
 
         // Copied from {@link UserDefinedFormController}
         if ($controller->Content && $form && !$controller->config()->disable_form_content_shortcode) {
-            $hasLocation = stristr($controller->Content, '$UserDefinedForm');
+            $hasLocation = stristr($controller->Content ?? '', '$UserDefinedForm');
             if ($hasLocation) {
                 /** @see Requirements_Backend::escapeReplacement */
-                $formEscapedForRegex = addcslashes($form->forTemplate(), '\\$');
+                $formEscapedForRegex = addcslashes($form->forTemplate() ?? '', '\\$');
                 $content = preg_replace(
                     '/(<p[^>]*>)?\\$UserDefinedForm(<\\/p>)?/i',
-                    $formEscapedForRegex,
-                    $controller->Content
+                    $formEscapedForRegex ?? '',
+                    $controller->Content ?? ''
                 );
 
                 return $controller->customise([
-                    'Content'     => DBField::create_field('HTMLText', $content),
-                    'Form'        => '',
-                    'PartialLink' => $partial->getPartialLink()
-                ])->renderWith([static::class, Page::class]);
+                    'Content' => DBField::create_field('HTMLText', $content),
+                    'Form' => ''
+                ]);
             }
         }
 
         return $controller->customise([
-            'Content'     => DBField::create_field('HTMLText', $controller->Content),
-            'Form'        => $form,
-            'PartialLink' => $partial->getPartialLink()
-        ])->renderWith([static::class, Page::class]);
+            'Content' => DBField::create_field('HTMLText', $controller->Content),
+            'Form' => $form
+        ]);
     }
 
     /**
-     * A little abstraction to be more readable
+     * Add partial submission and set the uploaded filenames as right title of the file fields
      *
-     * @param HTTPRequest $request
-     * @return PartialFormSubmission|void
-     * @throws HTTPResponse_Exception
+     * @param Form $form
+     * @param PartialFormSubmission $partial
      */
-    public function validateToken($request)
+    protected function populateData($form, $partial)
     {
-        // Ensure this URL doesn't get picked up by HTTP caches
-        HTTPCacheControlMiddleware::singleton()->disableCache();
+        $fields = $form->Fields();
+        // Add partial submission ID
+        $fields->push(
+            HiddenField::create(
+                'PartialID',
+                null,
+                $partial->ID
+            )
+        );
 
-        $key = $request->param('Key');
-        $token = $request->param('Token');
-        if (!$key || !$token) {
-            return $this->httpError(404);
+        // Populate files
+        $uploadFields = $partial->PartialUploads()->filter([
+            'UploadedFileID:not' => 0
+        ]);
+
+        if (!$uploadFields->exists()) {
+            return;
         }
 
-        /** @var PartialFormSubmission $partial */
-        $partial = PartialFormSubmission::get()->find('Token', $token);
-        if (!$token ||
-            !$partial ||
-            !$partial->UserDefinedFormID ||
-            !hash_equals($partial->generateKey($token), $key)
-        ) {
-            return $this->httpError(404);
+        foreach ($uploadFields as $uploadField) {
+            $request = $this->getRequest();
+            $file = $uploadField->UploadedFile();
+            $fileAttributes = ['PartialID' => $partial->ID, 'FileID' => $file->ID];
+
+            // Generate a unique download path that is specific to the current session, partial submission and field
+            $linkSrc = sprintf(
+                'partialfiledownload/%s/%s/%s',
+                $request->param('Key'),
+                $request->param('Token'),
+                $uploadField->Name
+            );
+
+            $linkTag = 'View <a href="%s" target="_blank">%s</a> &nbsp;
+                <a class="partial-file-remove" href="javascript:;" data-disabled="" data-file-remove=\'%s\'>Remove &cross;</a>';
+            $fileLink = sprintf(
+                $linkTag,
+                $linkSrc,
+                Convert::raw2att($file->Name),
+                json_encode($fileAttributes)
+            );
+            $inputField = $fields->dataFieldByName($uploadField->Name);
+            if ($inputField) {
+                $inputField->setRightTitle(DBField::create_field('HTMLText', $fileLink))
+                    ->removeExtraClass('requiredField')
+                    ->setAttribute('required', false)
+                    ->setAttribute('data-rule-required', 'false')
+                    ->setAttribute('aria-required', 'false');
+            }
         }
-
-        $sessionKey = PartialSubmissionController::SESSION_KEY;
-        // Set the session if the last session has expired
-        if (!$request->getSession()->get($sessionKey)) {
-            $request->getSession()->set($sessionKey, $partial->ID);
-        }
-
-        return $partial;
-    }
-
-    /**
-     * @return PartialFormSubmission
-     */
-    public function getPartialFormSubmission(): PartialFormSubmission
-    {
-        return $this->partialFormSubmission;
-    }
-
-    /**
-     * @param PartialFormSubmission $partialFormSubmission
-     */
-    public function setPartialFormSubmission(PartialFormSubmission $partialFormSubmission): void
-    {
-        $this->partialFormSubmission = $partialFormSubmission;
     }
 }

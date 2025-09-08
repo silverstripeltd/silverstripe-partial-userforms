@@ -4,8 +4,11 @@ namespace Firesphere\PartialUserforms\Models;
 
 use Exception;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormVerifyController;
+use Firesphere\PartialUserforms\Models\EditableRepeatField;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldButtonRow;
@@ -19,8 +22,10 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\RandomGenerator;
+use SilverStripe\UserForms\Model\Submission\SubmittedFileField;
 use SilverStripe\UserForms\Model\Submission\SubmittedForm;
 use SilverStripe\UserForms\Model\UserDefinedForm;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFormStep;
 
 /**
  * Class \Firesphere\PartialUserforms\Models\PartialFormSubmission
@@ -46,10 +51,12 @@ class PartialFormSubmission extends SubmittedForm
      * @var array
      */
     private static $db = [
-        'IsSend'    => 'Boolean(false)',
-        'TokenSalt' => 'Varchar(16)',
-        'Token'     => 'Varchar(16)',
-        'Password'  => 'Varchar(64)',
+        'IsSend'            => 'Boolean(false)',
+        'TokenSalt'         => 'Varchar(16)',
+        'Token'             => 'Varchar(16)',
+        'Password'          => 'Varchar(64)',
+        'LockedOutUntil'    => 'Datetime',
+        'PHPSessionID'      => 'Varchar(128)'
     ];
 
     /**
@@ -67,8 +74,12 @@ class PartialFormSubmission extends SubmittedForm
         'PartialUploads' => PartialFileFieldSubmission::class
     ];
 
+    /**
+     * @var array
+     */
     private static $cascade_deletes = [
-        'PartialFields'
+        'PartialFields',
+        'PartialUploads',
     ];
 
     /**
@@ -119,19 +130,69 @@ class PartialFormSubmission extends SubmittedForm
             'Token',
             'UserDefinedFormID',
             'Submitter',
-            'PartialUploads'
+            'PartialUploads',
+            'Password',
+            'LockedOutUntil',
+            'PHPSessionID'
         ]);
 
-        $partialFields = $this->PartialFields();
-        $fileFields = $this->PartialUploads();
         $list = ArrayList::create();
-        $list->merge($partialFields);
-        $list->merge($fileFields);
+        $partials = ArrayList::create();
+        $partials->merge($this->PartialFields());
+        $partials->merge($this->PartialUploads());
+        $editableFields = $this->Parent()
+            ->Fields()
+            ->exclude('ClassName', EditableFormStep::class)
+            ->sort('Sort')
+            ->filterByCallback(function($item, $list) {
+                return !Config::inst()->get($item, 'literal');
+            });
+
+        foreach ($editableFields as $editable) {
+            $partial = $partials->find('Name', $editable->Name);
+            if (!$partial) {
+                continue;
+            }
+            if ($editable->ClassName === EditableRepeatField::class) {
+                $submissions = [];
+                $repeatValues = $partial->Value ? array_filter(explode(',', $partial->Value)) : [];
+                array_unshift($repeatValues, 0);
+
+                for($index = 0; $index <= $editable->Maximum; $index++) {
+                    if (!in_array($index, $repeatValues)) {
+                        continue;
+                    }
+                    foreach ($editable->Repeats() as $field) {
+                        $fieldName = $index ? $field->Name . '__' . $index : $field->Name;
+                        $partial = $partials->find('Name', $fieldName);
+                        $value = null;
+                        if ($partial) {
+                            $value = $partial->Value;
+                            if ($partial instanceof SubmittedFileField) {
+                                $value = sprintf(
+                                    '%s - <a href="%s" target="_blank">%s</a>',
+                                    Convert::raw2att($partial->getFileName()),
+                                    Convert::raw2att($partial->getLink()),
+                                    $partial->getLink()
+                                );
+                            }
+                        }
+                        $submissions[$index][$field->Title] = $value;
+                    }
+                }
+                $list->push(SubmittedRepeatField::create([
+                    'Title' => $editable->Title,
+                    'Value' => json_encode($submissions)
+                ]));
+            } else {
+                $list->push($partial);
+            }
+        }
 
         $partialFields = GridField::create(
             'PartialFields',
             _t(static::class . '.PARTIALFIELDS', 'Partial fields'),
-            $list->sort('Created', 'ASC')
+            $list
         );
 
         $exportColumns = [
@@ -169,13 +230,11 @@ class PartialFormSubmission extends SubmittedForm
             return '(none)';
         }
 
-        $token = $this->Token;
-
         return Controller::join_links(
             Director::absoluteBaseURL(),
             'partial',
-            $this->generateKey($token),
-            $token
+            $this->generateKey($this->Token),
+            $this->Token
         );
     }
 
@@ -198,26 +257,15 @@ class PartialFormSubmission extends SubmittedForm
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        $this->getPartialToken();
-        if (!$this->Password) {
-            $this->Password = $this->generatePassword();
-        }
-    }
 
-    /**
-     * Get the unique token for the share link
-     *
-     * @return bool|string|null
-     * @throws Exception
-     */
-    protected function getPartialToken()
-    {
         if (!$this->TokenSalt) {
             $this->TokenSalt = $this->generateToken();
             $this->Token = $this->generateToken();
         }
 
-        return $this->Token;
+        if (!$this->Password) {
+            $this->Password = $this->generatePassword();
+        }
     }
 
     /**
@@ -276,7 +324,7 @@ class PartialFormSubmission extends SubmittedForm
      */
     public function canView($member = null)
     {
-        if ($this->UserDefinedForm()) {
+        if ($this->UserDefinedFormID) {
             return $this->UserDefinedForm()->canView($member);
         }
 
@@ -291,7 +339,7 @@ class PartialFormSubmission extends SubmittedForm
      */
     public function canEdit($member = null)
     {
-        if ($this->UserDefinedForm()) {
+        if ($this->UserDefinedFormID) {
             return $this->UserDefinedForm()->canEdit($member);
         }
 
@@ -305,10 +353,44 @@ class PartialFormSubmission extends SubmittedForm
      */
     public function canDelete($member = null)
     {
-        if ($this->UserDefinedForm()) {
+        if ($this->UserDefinedFormID) {
             return $this->UserDefinedForm()->canDelete($member);
         }
 
         return parent::canDelete($member);
+    }
+
+    /**
+     * Get all partial fields for loading data into the form
+     *
+     * @return array
+     */
+    public function getFields()
+    {
+        $formFields = $this->PartialFields()->map('Name', 'Value')->toArray();
+        $fileFields = $this->PartialUploads()->map('Name', 'FileName')->toArray();
+
+        return array_merge($formFields, $fileFields);
+    }
+
+    /**
+     * Validate key/token combination
+     *
+     * @param string $key
+     * @param string $token
+     * @return bool|PartialFormSubmission
+     */
+    public static function validateKeyToken($key, $token)
+    {
+        /** @var PartialFormSubmission $partial */
+        $partial = PartialFormSubmission::get()->find('Token', $token);
+        if (!$partial ||
+            !$partial->UserDefinedFormID ||
+            !hash_equals($partial->generateKey($token), $key)
+        ) {
+            return false;
+        }
+
+        return $partial;
     }
 }

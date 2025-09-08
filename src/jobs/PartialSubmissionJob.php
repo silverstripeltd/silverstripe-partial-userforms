@@ -41,7 +41,7 @@ class PartialSubmissionJob extends AbstractQueuedJob
     /**
      * @var array
      */
-    protected $addresses;
+    protected $addresses = [];
 
 
     /**
