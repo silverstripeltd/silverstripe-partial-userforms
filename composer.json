@@ -30,8 +30,8 @@
     "extra": {
         "installer-name": "partialuserforms",
         "branch-alias": {
-            "1.x-dev": "1.0.x-dev",
-            "dev-master": "1.x-dev"
+            "1.x-dev": "5.0.x-dev",
+            "dev-main": "1.x-dev"
         },
         "expose": [
             "client/dist"
