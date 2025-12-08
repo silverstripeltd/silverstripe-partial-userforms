@@ -5,10 +5,10 @@ namespace Firesphere\PartialUserforms\Extensions;
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Admin\AdminRootController;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\Control\Controller;
 
-class EditableFileFieldExtension extends DataExtension
+class EditableFileFieldExtension extends Extension
 {
     public function afterUpdateFormField($field)
     {

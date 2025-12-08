@@ -17,7 +17,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\UserForms\Control\UserDefinedFormController;
 use SilverStripe\UserForms\Model\EditableFormField;

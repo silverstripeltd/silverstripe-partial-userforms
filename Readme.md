@@ -21,9 +21,9 @@ and setting the configuration in the Settings
 
 # Requirements
 
-- UserDefinedForms 5+
-- SilverStripe Recipe CMS 1+
-- QueuedJobs 4+
+- UserDefinedForms 7+
+- SilverStripe Recipe CMS 6+
+- QueuedJobs 6+
 
 ## Dev requirements
 

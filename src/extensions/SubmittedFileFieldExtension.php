@@ -3,11 +3,10 @@
 namespace Firesphere\PartialUserforms\Extensions;
 
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
-use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Control\Controller;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 
-class SubmittedFileFieldExtension extends DataExtension
+class SubmittedFileFieldExtension extends Extension
 {
     public function onPopulationFromField($field)
     {

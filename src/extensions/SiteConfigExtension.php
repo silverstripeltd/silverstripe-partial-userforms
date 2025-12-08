@@ -5,13 +5,13 @@ namespace Firesphere\PartialUserforms\Extensions;
 use Exception;
 use Firesphere\PartialUserforms\Jobs\PartialSubmissionJob;
 use Firesphere\PartialUserforms\Services\DateService;
+use SilverStripe\Core\Extension;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\EmailField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
@@ -26,7 +26,7 @@ use Symbiote\QueuedJobs\Services\QueuedJobService;
  * @property string $SendMailTo
  * @property string $SendMailFrom
  */
-class SiteConfigExtension extends DataExtension
+class SiteConfigExtension extends Extension
 {
     /**
      * @var array

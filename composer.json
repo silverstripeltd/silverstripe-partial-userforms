@@ -18,13 +18,13 @@
     ],
     "require": {
         "php": ">=8",
-        "silverstripe/recipe-cms": "^5",
-        "silverstripe/userforms": "^6",
-        "symbiote/silverstripe-queuedjobs": "^5"
+        "silverstripe/recipe-cms": "^6",
+        "silverstripe/userforms": "^7",
+        "symbiote/silverstripe-queuedjobs": "^6"
     },
     "require-dev": {
         "scriptfusion/phpunit-immediate-exception-printer": "^2.0",
-        "phpunit/phpunit": "^9",
+        "phpunit/phpunit": "^11",
         "squizlabs/php_codesniffer": "^3.0"
     },
     "extra": {

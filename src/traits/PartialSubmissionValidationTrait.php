@@ -8,7 +8,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Control\Middleware\HTTPCacheControlMiddleware;
-use SilverStripe\ORM\ValidationException;
+use SilverStripe\Core\Validation\ValidationException;
 
 trait PartialSubmissionValidationTrait
 {

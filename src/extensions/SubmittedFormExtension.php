@@ -7,7 +7,7 @@ use Firesphere\PartialUserforms\Controllers\PartialUserFormVerifyController;
 use Firesphere\PartialUserforms\Forms\PasswordForm;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Control\Controller;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\UserForms\Model\Submission\SubmittedForm;
 
 /**
@@ -15,7 +15,7 @@ use SilverStripe\UserForms\Model\Submission\SubmittedForm;
  *
  * @property SubmittedForm|SubmittedFormExtension $owner
  */
-class SubmittedFormExtension extends DataExtension
+class SubmittedFormExtension extends Extension
 {
 
     /**
