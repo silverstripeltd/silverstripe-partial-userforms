@@ -17,7 +17,7 @@ use SilverStripe\Control\Session;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\ORM\ValidationException;
+use SilverStripe\Core\Validation\ValidationException;
 use SilverStripe\UserForms\Model\EditableFormField;
 
 /**

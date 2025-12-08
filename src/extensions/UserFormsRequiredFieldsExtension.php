@@ -5,19 +5,19 @@ namespace Firesphere\PartialUserforms\Extensions;
 use InvalidArgumentException;
 use SilverStripe\Forms\FormField;
 use SilverStripe\UserForms\Model\EditableFormField;
-use SilverStripe\UserForms\Form\UserFormsRequiredFields;
+use SilverStripe\UserForms\Form\UserFormsRequiredFieldsValidator;
 
 /**
- * This is exact copy of vendor/silverstripe/userforms/code/Form/UserFormsRequiredFields.php
+ * This is exact copy of vendor/silverstripe/userforms/code/Form/UserFormsRequiredFieldsValidator.php
  * What's changed:
- * https://github.com/silverstripe/silverstripe-userforms/blob/6.2.6/code/Form/UserFormsRequiredFields.php#L113-L117
+ * https://github.com/silverstripe/silverstripe-userforms/blob/6.2.6/code/Form/UserFormsRequiredFieldsValidator.php#L113-L117
  * the above lines are replace by following single line code
  * $error = (count($value ?? [])) ? false : true;
  *
  * This change has been added to fix the bug https://mbiessd.atlassian.net/browse/MWP-735
  * or as described in https://github.com/silverstripeltd/silverstripe-partial-userforms/pull/8
  */
-class UserFormsRequiredFieldsExtension extends UserFormsRequiredFields
+class UserFormsRequiredFieldsExtension extends UserFormsRequiredFieldsValidator
 {
     /**
      * Allows validation of fields via specification of a php function for

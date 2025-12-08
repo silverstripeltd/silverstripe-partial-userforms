@@ -4,9 +4,9 @@ namespace Firesphere\PartialUserforms\Extensions;
 
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TextField;
+use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataList;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Forms\FieldList;;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\GridField\GridField;
@@ -25,7 +25,7 @@ use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
  * @property boolean $PasswordProtected
  * @method DataList|PartialFormSubmission[] PartialSubmissions()
  */
-class UserDefinedFormExtension extends DataExtension
+class UserDefinedFormExtension extends Extension
 {
     /**
      * @var array
