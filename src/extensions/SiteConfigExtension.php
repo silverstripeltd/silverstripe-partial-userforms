@@ -72,8 +72,6 @@ class SiteConfigExtension extends Extension
      */
     public function onAfterWrite()
     {
-        parent::onAfterWrite();
-
         if ($this->owner->SendDailyEmail && !empty($this->owner->SendMailTo)) {
             $jobs = QueuedJobDescriptor::get()->filter([
                 'Implementation'         => PartialSubmissionJob::class,
