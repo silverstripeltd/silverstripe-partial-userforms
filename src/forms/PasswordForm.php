@@ -23,11 +23,11 @@ class PasswordForm extends Form
      * @param Validator|null $validator
      */
     public function __construct(
-        PartialUserFormVerifyController $controller = null,
+        ?PartialUserFormVerifyController $controller = null,
         $name = self::DEFAULT_NAME,
-        FieldList $fields = null,
-        FieldList $actions = null,
-        Validator $validator = null
+        ?FieldList $fields = null,
+        ?FieldList $actions = null,
+        ?Validator $validator = null
     ) {
         if (!$fields) {
             $fields = $this->getFields();

@@ -105,7 +105,7 @@ class UserDefinedFormControllerExtension extends Extension
     /**
      * Redirect user to form start if EnablePartialSubmissions is true
      */
-    public function partialIndex(HTTPRequest $request = null)
+    public function partialIndex(?HTTPRequest $request = null)
     {
         if (!$this->owner->EnablePartialSubmissions) {
             return $this->owner->index($request);
@@ -117,7 +117,7 @@ class UserDefinedFormControllerExtension extends Extension
     /**
      * Verify route, for password entry
      */
-    public function verify(HTTPRequest $request = null)
+    public function verify(?HTTPRequest $request = null)
     {
         if (!$this->owner->EnablePartialSubmissions) {
             return $this->owner->redirect($this->owner->Link());
@@ -145,7 +145,7 @@ class UserDefinedFormControllerExtension extends Extension
     /**
      * Start route
      */
-    public function start(HTTPRequest $request = null)
+    public function start(?HTTPRequest $request = null)
     {
         if (!$this->owner->EnablePartialSubmissions) {
             return $this->owner->redirect($this->owner->Link());
@@ -189,7 +189,7 @@ class UserDefinedFormControllerExtension extends Extension
     /**
      * Overview route
      */
-    public function overview(HTTPRequest $request = null)
+    public function overview(?HTTPRequest $request = null)
     {
         if (!$this->owner->EnablePartialSubmissions) {
             return $this->owner->redirect($this->owner->Link());
@@ -221,7 +221,7 @@ class UserDefinedFormControllerExtension extends Extension
      * Creates the overview form to display the form link and password
      * @return Form
      */
-    public function OverviewForm(HTTPRequest $request = null)
+    public function OverviewForm(?HTTPRequest $request = null)
     {
         $partialID = $request->getSession()->get(PartialSubmissionController::SESSION_KEY);
         $password = $request->getSession()->get(PartialUserFormVerifyController::PASSWORD_KEY);
