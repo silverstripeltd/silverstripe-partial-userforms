@@ -64,9 +64,9 @@ class PartialFieldSubmissionTest extends SapphireTest
         $this->assertTrue($this->field->canDelete($member));
     }
 
-    protected function setUp()
+    protected function setup(): void
     {
-        parent::setUp();
+        parent::setup();
 
         $this->field = PartialFieldSubmission::create();
         $partialForm = PartialFormSubmission::create();

@@ -8,6 +8,7 @@ use SilverStripe\Control\Director;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableTextField;
 use SilverStripe\UserForms\Model\UserDefinedForm;
 
 class PartialFormSubmissionTest extends SapphireTest
@@ -152,16 +153,26 @@ class PartialFormSubmissionTest extends SapphireTest
         $this->assertEquals($pwd, $this->submission->Password);
     }
 
-    protected function setUp()
+    protected function setup(): void
     {
-        parent::setUp();
+        parent::setup();
 
         $this->submission = Injector::inst()->get(PartialFormSubmission::class);
+
         $form = UserDefinedForm::create(['Title' => 'Test']);
         $formID = $form->write();
+        $editableField = EditableTextField::create([
+            'Name' => 'Title',
+            'Title' => 'Title',
+            'Required' => false,
+            'ParentID' => $form->ID,
+        ]);
+        $editableField->write();
         $form->publishRecursive();
+        $this->submission->ParentID = $editableField->ID;
         $this->submission->UserDefinedFormID = $formID;
         $this->submission->UserDefinedFormClass = UserDefinedForm::class;
         $this->submission->write();
+        $this->submission->publishRecursive();
     }
 }

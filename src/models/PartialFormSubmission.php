@@ -246,7 +246,7 @@ class PartialFormSubmission extends SubmittedForm
      */
     public function generateKey($token)
     {
-        return hash_pbkdf2('sha256', $token, $this->TokenSalt, 1000, 16);
+        return hash_pbkdf2('sha256', $token, (string)$this->TokenSalt, 1000, 16);
     }
 
     /**
@@ -295,7 +295,7 @@ class PartialFormSubmission extends SubmittedForm
         $pwd = implode(array_slice($chars, 0, 10));
         Controller::curr()->getRequest()->getSession()->set(PartialUserFormVerifyController::PASSWORD_KEY, $pwd);
 
-        return hash_pbkdf2('SHA256', $pwd, $this->TokenSalt, 1000);
+        return hash_pbkdf2('SHA256', $pwd, (string)$this->TokenSalt, 1000);
     }
 
     /**

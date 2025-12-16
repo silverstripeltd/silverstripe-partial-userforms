@@ -26,7 +26,7 @@ class PartialSubmissionJobTest extends SapphireTest
         $this->assertEquals('Export partial submissions to Email', $this->job->getTitle());
     }
 
-    public function testSetup()
+    public function testsetup(): void
     {
         $this->job->setup();
 
@@ -58,7 +58,7 @@ class PartialSubmissionJobTest extends SapphireTest
         }
     }
 
-    public function testProcessNotSetup()
+    public function testProcessNotsetup(): void
     {
         SiteConfigHelper::setupSiteConfig('', null, false);
         Security::setCurrentUser(null);
@@ -179,9 +179,9 @@ class PartialSubmissionJobTest extends SapphireTest
         $this->assertEmailSent('test@example.com', 'site@' . Director::host());
     }
 
-    protected function setUp()
+    protected function setup(): void
     {
-        parent::setUp();
+        parent::setup();
 
         DBDatetime::set_mock_now('2018-01-01 12:00:00');
         /** @var PartialSubmissionJob $job */

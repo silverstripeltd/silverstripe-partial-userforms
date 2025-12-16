@@ -249,9 +249,9 @@ class PartialSubmissionControllerTest extends FunctionalTest
         return $this->session()->get(PartialSubmissionController::SESSION_KEY);
     }
 
-    public function setUp()
+    public function setup(): void
     {
-        parent::setUp();
+        parent::setup();
         $udf = $this->objFromFixture(UserDefinedForm::class, 'form1');
         $udf->publishRecursive();
         $this->controller = Injector::inst()->get(PartialSubmissionController::class);
@@ -266,7 +266,7 @@ class PartialSubmissionControllerTest extends FunctionalTest
         $this->session()->set(PartialSubmissionController::SESSION_KEY, $partialID);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if (session_id()) {
             // Set the session back to empty string to prevent destroying uninitialized session

@@ -111,9 +111,9 @@ class SiteConfigExtensionTest extends SapphireTest
         $this->assertCount(1, $jobs);
     }
 
-    protected function setUp()
+    protected function setup(): void
     {
-        parent::setUp();
+        parent::setup();
 
         Config::modify()->set(QueuedJobService::class, 'use_shutdown_function', false);
         /** @var SiteConfigExtension $extension */
@@ -122,7 +122,7 @@ class SiteConfigExtensionTest extends SapphireTest
         $this->extension = $extension;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         /** DataList */
         QueuedJobDescriptor::get()

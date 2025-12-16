@@ -12,7 +12,7 @@ class EditableFileFieldExtension extends Extension
 {
     public function afterUpdateFormField($field)
     {
-        if (!Controller::has_curr()) {
+        if (!Controller::curr()) {
             return $field;
         }
 

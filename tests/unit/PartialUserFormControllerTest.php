@@ -164,14 +164,14 @@ class PartialUserFormControllerTest extends FunctionalTest
         $this->assertContains('/client/dist/main.js', $response->getBody());
     }
 
-    public function setUp()
+    public function setup(): void
     {
-        parent::setUp();
+        parent::setup();
         $this->objFromFixture(UserDefinedForm::class, 'form1')->publishRecursive();
         $this->objFromFixture(File::class, 'file1')->publishRecursive();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if (session_id()) {
             // Set the session back to empty string to prevent destroying uninitialized session

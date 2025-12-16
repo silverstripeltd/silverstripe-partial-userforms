@@ -17,15 +17,15 @@
         }
     ],
     "require": {
-        "php": ">=8",
+        "php": "^8.4",
         "silverstripe/recipe-cms": "^6",
         "silverstripe/userforms": "^7",
         "symbiote/silverstripe-queuedjobs": "^6"
     },
     "require-dev": {
-        "scriptfusion/phpunit-immediate-exception-printer": "^2.0",
         "phpunit/phpunit": "^11",
-        "squizlabs/php_codesniffer": "^3.0"
+        "squizlabs/php_codesniffer": "^3.0",
+        "scriptfusion/phpunit-immediate-exception-printer": "^3.5"
     },
     "extra": {
         "installer-name": "partialuserforms",
@@ -43,8 +43,28 @@
                 "Firesphere\\PartialUserForms\\Models": "src/models",
                 "Firesphere\\PartialUserForms\\Jobs": "src/jobs"
             }
-        }
+        },
+        "project-files-installed": [
+            ".htaccess",
+            "app/.htaccess",
+            "app/_config/mimevalidator.yml",
+            "app/_config/mysite.yml",
+            "app/src/Page.php",
+            "app/src/PageController.php"
+        ],
+        "public-files-installed": [
+            ".htaccess",
+            "index.php",
+            "web.config"
+        ]
     },
     "prefer-stable": true,
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/recipe-plugin": true,
+            "silverstripe/vendor-plugin": true
+        }
+    }
 }
