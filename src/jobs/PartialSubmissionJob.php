@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Jobs;
 
+use Override;
 use Exception;
 use Firesphere\PartialUserforms\Models\PartialFieldSubmission;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
@@ -47,6 +48,7 @@ class PartialSubmissionJob extends AbstractQueuedJob
     /**
      * Prepare the data
      */
+    #[Override]
     public function setup()
     {
         parent::setup();
@@ -64,14 +66,14 @@ class PartialSubmissionJob extends AbstractQueuedJob
         if ($result) {
             $this->addresses[] = $email;
         }
-        if (strpos($email, ',') !== false) {
-            $emails = explode(',', $email);
+        if (str_contains((string) $email, ',')) {
+            $emails = explode(',', (string) $email);
             foreach ($emails as $address) {
                 $result = Email::is_valid_address(trim($address));
                 if ($result) {
                     $this->addresses[] = trim($address);
                 } else {
-                    $this->addMessage($address . _t(__CLASS__ . '.invalidMail', ' is not a valid email address'));
+                    $this->addMessage($address . _t(self::class . '.invalidMail', ' is not a valid email address'));
                 }
             }
         }
@@ -82,7 +84,7 @@ class PartialSubmissionJob extends AbstractQueuedJob
      */
     public function getTitle()
     {
-        return _t(__CLASS__ . '.Title', 'Export partial submissions to Email');
+        return _t(self::class . '.Title', 'Export partial submissions to Email');
     }
 
     /**
@@ -91,13 +93,13 @@ class PartialSubmissionJob extends AbstractQueuedJob
     public function process()
     {
         if (!$this->config->SendDailyEmail) {
-            $this->addMessage(_t(__CLASS__ . '.NotActive', 'Daily exports are not enabled'));
+            $this->addMessage(_t(self::class . '.NotActive', 'Daily exports are not enabled'));
             $this->isComplete = true;
 
             return;
         }
         if (!count($this->addresses)) {
-            $this->addMessage(_t(__CLASS__ . '.EmailError', 'Can not process without valid email'));
+            $this->addMessage(_t(self::class . '.EmailError', 'Can not process without valid email'));
             $this->isComplete = true;
 
             return;
@@ -107,7 +109,7 @@ class PartialSubmissionJob extends AbstractQueuedJob
 
         /** @var UserDefinedForm $form */
         foreach ($userDefinedForms as $form) {
-            $fileName = _t(__CLASS__ . '.Export', 'Export of ') .
+            $fileName = _t(self::class . '.Export', 'Export of ') .
                 $form->Title . ' - ' .
                 DBDatetime::now()->Format(DBDatetime::ISO_DATETIME);
             $file = '/tmp/' . $fileName . '.csv';
@@ -169,7 +171,7 @@ class PartialSubmissionJob extends AbstractQueuedJob
             ->Fields()
             ->exclude($excludeFields)
             ->column('Title');
-        fputcsv($resource, $headerFields);
+        fputcsv($resource, $headerFields, escape: '\\');
 
         if ($submissions->count()) {
             $this->processSubmissions($form, $submissions, $resource);
@@ -207,7 +209,7 @@ class PartialSubmissionJob extends AbstractQueuedJob
         }
         $this->extend('updateCSVRecords', $submitted, $editableFields);
         foreach ($submitted as $submitItem) {
-            fputcsv($resource, $submitItem);
+            fputcsv($resource, $submitItem, escape: '\\');
         }
     }
 

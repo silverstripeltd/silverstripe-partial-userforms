@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use Override;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
@@ -140,7 +141,7 @@ class PartialFormSubmissionTest extends SapphireTest
         $partial->TokenSalt = 'test-salt';
         $key = $partial->generateKey($token);
         $this->assertEquals('30505a53806d5de9', $key);
-        $this->assertEquals(16, strlen($key));
+        $this->assertEquals(16, strlen((string) $key));
     }
 
     public function testOnBeforeWrite()
@@ -153,6 +154,7 @@ class PartialFormSubmissionTest extends SapphireTest
         $this->assertEquals($pwd, $this->submission->Password);
     }
 
+    #[Override]
     protected function setup(): void
     {
         parent::setup();

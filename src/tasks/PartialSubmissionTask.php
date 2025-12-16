@@ -4,7 +4,6 @@ namespace Firesphere\PartialUserforms\Tasks;
 
 use Firesphere\PartialUserforms\Jobs\PartialSubmissionJob;
 use SilverStripe\Control\Email\Email;
-use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Security\Security;
@@ -17,7 +16,7 @@ class PartialSubmissionTask extends BuildTask
 
     public function __construct()
     {
-        $this->title = _t(__CLASS__ . '.Title', 'Export partial form submissions to email address');
+        $this->title = _t(self::class . '.Title', 'Export partial form submissions to email address');
         parent::__construct();
     }
 

@@ -4,7 +4,6 @@ namespace Firesphere\PartialUserforms\Extensions;
 
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
-use SilverStripe\Admin\AdminRootController;
 use SilverStripe\Core\Extension;
 use SilverStripe\Control\Controller;
 
@@ -22,7 +21,7 @@ class EditableFileFieldExtension extends Extension
         $currentPath = rtrim($request->getURL(), '/') . '/';
         $link = $controller->Link();
 
-        if (substr($currentPath, 0, strlen($partialPath)) !== $partialPath) {
+        if (!str_starts_with($currentPath, $partialPath)) {
             return $field;
         }
 
@@ -35,7 +34,7 @@ class EditableFileFieldExtension extends Extension
         }
 
         $field->setFolderName(
-            preg_replace("/^assets\//", "", $folderName)
+            preg_replace("/^assets\//", "", (string) $folderName)
         );
 
         return $field;

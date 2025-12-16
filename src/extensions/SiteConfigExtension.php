@@ -48,23 +48,23 @@ class SiteConfigExtension extends Extension
         $fields->addFieldsToTab('Root.PartialUserFormSubmissions', [
             CheckboxField::create(
                 'SendDailyEmail',
-                _t(__CLASS__ . '.SendDailyEmail', 'Send partial submissions daily')
+                _t(self::class . '.SendDailyEmail', 'Send partial submissions daily')
             ),
             CheckboxField::create(
                 'CleanupAfterSend',
-                _t(__CLASS__ . '.CleanupAfterSend', 'Remove partial submissions after sending')
+                _t(self::class . '.CleanupAfterSend', 'Remove partial submissions after sending')
             ),
             $emailField = TextField::create(
                 'SendMailTo',
-                _t(__CLASS__ . '.SendMailTo', 'Email address the partial submissions should be send to')
+                _t(self::class . '.SendMailTo', 'Email address the partial submissions should be send to')
             ),
             EmailField::create(
                 'SendMailFrom',
-                _t(__CLASS__ . '.SendMailFrom', 'Email address from which the partial submissions should be send')
+                _t(self::class . '.SendMailFrom', 'Email address from which the partial submissions should be send')
             )
         ]);
 
-        $emailField->setDescription(_t(__CLASS__ . '.EmailDescription', 'Can be a comma separated set of addresses'));
+        $emailField->setDescription(_t(self::class . '.EmailDescription', 'Can be a comma separated set of addresses'));
     }
 
     /**

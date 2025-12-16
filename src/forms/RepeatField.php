@@ -2,9 +2,9 @@
 
 namespace Firesphere\PartialUserforms\Forms;
 
+use Override;
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\FormField;
 
 class RepeatField extends CompositeField
 {
@@ -25,6 +25,7 @@ class RepeatField extends CompositeField
         }
     }
 
+    #[Override]
     public function hasData()
     {
         return true;

@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Models;
 
+use Override;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\UserForms\Model\Submission\SubmittedFormField;
@@ -14,9 +15,10 @@ class SubmittedRepeatField extends SubmittedFormField
      *
      * @return string
      */
+    #[Override]
     public function getFormattedValue()
     {
-        $submissions = json_decode($this->dbObject('Value')->RAW());
+        $submissions = json_decode((string) $this->dbObject('Value')->RAW());
         $html = '';
 
         foreach ($submissions as $items) {
@@ -35,6 +37,7 @@ class SubmittedRepeatField extends SubmittedFormField
      *
      * @return string
      */
+    #[Override]
     public function getExportValue()
     {
         return $this->getFormattedValue()->Plain();

@@ -2,13 +2,13 @@
 
 namespace Firesphere\PartialUserforms\Forms;
 
+use SilverStripe\Forms\Validation\Validator;
+use SilverStripe\Forms\Validation\RequiredFieldsValidator;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormVerifyController;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\PasswordField;
-use SilverStripe\Forms\RequiredFields;
-use SilverStripe\Forms\Validator;
 
 class PasswordForm extends Form
 {
@@ -52,7 +52,7 @@ class PasswordForm extends Form
     protected function getFields()
     {
         return FieldList::create([
-            PasswordField::create('Password', _t(__CLASS__ . '.PasswordField', 'Password'))
+            PasswordField::create('Password', _t(self::class . '.PasswordField', 'Password'))
         ]);
     }
 
@@ -62,15 +62,15 @@ class PasswordForm extends Form
     protected function getActions()
     {
         return FieldList::create([
-            FormAction::create('doValidate', _t(__CLASS__ . '.Validate', 'Submit'))
+            FormAction::create('doValidate', _t(self::class . '.Validate', 'Submit'))
         ]);
     }
 
     /**
-     * @return RequiredFields
+     * @return RequiredFieldsValidator
      */
     public function getFormValidator()
     {
-        return RequiredFields::create(['Password']);
+        return RequiredFieldsValidator::create(['Password']);
     }
 }

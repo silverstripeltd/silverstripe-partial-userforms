@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Models;
 
+use Override;
 use SilverStripe\Security\Member;
 use SilverStripe\UserForms\Model\Submission\SubmittedFormField;
 
@@ -31,6 +32,7 @@ class PartialFieldSubmission extends SubmittedFormField
      * @param array $context
      * @return boolean
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -41,6 +43,7 @@ class PartialFieldSubmission extends SubmittedFormField
      *
      * @return boolean|string
      */
+    #[Override]
     public function canView($member = null)
     {
         if ($this->SubmittedFormID) {
@@ -55,6 +58,7 @@ class PartialFieldSubmission extends SubmittedFormField
      *
      * @return boolean|string
      */
+    #[Override]
     public function canEdit($member = null)
     {
         if ($this->SubmittedFormID) {
@@ -69,6 +73,7 @@ class PartialFieldSubmission extends SubmittedFormField
      *
      * @return boolean|string
      */
+    #[Override]
     public function canDelete($member = null)
     {
         if ($this->SubmittedFormID) {

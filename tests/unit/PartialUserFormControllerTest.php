@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use Override;
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Assets\File;
@@ -164,6 +165,7 @@ class PartialUserFormControllerTest extends FunctionalTest
         $this->assertContains('/client/dist/main.js', $response->getBody());
     }
 
+    #[Override]
     public function setup(): void
     {
         parent::setup();
@@ -171,6 +173,7 @@ class PartialUserFormControllerTest extends FunctionalTest
         $this->objFromFixture(File::class, 'file1')->publishRecursive();
     }
 
+    #[Override]
     public function tearDown(): void
     {
         if (session_id()) {

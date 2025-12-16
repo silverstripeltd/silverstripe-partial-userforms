@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Models;
 
+use Override;
 use SilverStripe\Assets\File;
 use SilverStripe\Core\Convert;
 use SilverStripe\Assets\Upload;
@@ -20,12 +21,9 @@ use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\UserForms\Form\GridFieldAddClassesButton;
 use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
 use Firesphere\PartialUserforms\Models\SubmittedRepeatField;
-use SilverStripe\UserForms\Model\EditableFormField\EditableFormStep;
 use SilverStripe\UserForms\Model\EditableFormField\EditableFileField;
 use SilverStripe\UserForms\Model\EditableFormField\EditableTextField;
-use SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroup;
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
-use SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroupEnd;
 
 class EditableRepeatField extends EditableFormField
 {
@@ -47,6 +45,7 @@ class EditableRepeatField extends EditableFormField
         'Repeats'
     ];
 
+    #[Override]
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -56,11 +55,13 @@ class EditableRepeatField extends EditableFormField
         }
     }
 
+    #[Override]
     public function getSubmittedFormField()
     {
         return SubmittedRepeatField::create();
     }
 
+    #[Override]
     public function getFormField()
     {
         // Add required javascripts
@@ -103,6 +104,7 @@ class EditableRepeatField extends EditableFormField
         return $field;
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -147,7 +149,7 @@ class EditableRepeatField extends EditableFormField
                 new GridFieldPaginator(999)
             );
 
-        $addButton->setButtonName(_t(__CLASS__ . '.ADD_FIELD', 'Add Field'))->setButtonClass('btn-primary');
+        $addButton->setButtonName(_t(self::class . '.ADD_FIELD', 'Add Field'))->setButtonClass('btn-primary');
         $editButton->removeExtraClass('grid-field__icon-action--hidden-on-hover');
 
         $fieldEditor = GridField::create(
@@ -173,7 +175,7 @@ class EditableRepeatField extends EditableFormField
         }
 
         $submissions = [];
-        $repeatValues = $data[$this->Name] ? array_filter(explode(',', $data[$this->Name])) : [];
+        $repeatValues = $data[$this->Name] ? array_filter(explode(',', (string) $data[$this->Name])) : [];
         array_unshift($repeatValues, 0); // The original repeated field children
 
         for ($index = 0; $index <= $this->Maximum; $index++) {

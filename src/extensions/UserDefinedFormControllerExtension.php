@@ -2,6 +2,13 @@
 
 namespace Firesphere\PartialUserforms\Extensions;
 
+use SilverStripe\SpamProtection\EditableSpamProtectionField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFormHeading;
+use SilverStripe\UserForms\Model\EditableFormField\EditableLiteralField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableMemberListField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroup;
+use SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroupEnd;
+use SilverStripe\Core\Validation\ValidationException;
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormController;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormVerifyController;
@@ -50,7 +57,7 @@ class UserDefinedFormControllerExtension extends Extension
     /**
      * Creates a new partial submission and partial fields.
      *
-     * @throws \SilverStripe\ORM\ValidationException
+     * @throws ValidationException
      */
     protected function createPartialSubmission()
     {
@@ -332,10 +339,10 @@ class UserDefinedFormControllerExtension extends Extension
     {
         // Ignore following form fields as they are not part of submission
         $ignoreFields = [
-            "SilverStripe\SpamProtection\EditableSpamProtectionField",
-            "SilverStripe\UserForms\Model\EditableFormField\EditableFormHeading",
-            "SilverStripe\UserForms\Model\EditableFormField\EditableLiteralField",
-            "SilverStripe\UserForms\Model\EditableFormField\EditableMemberListField",
+            EditableSpamProtectionField::class,
+            EditableFormHeading::class,
+            EditableLiteralField::class,
+            EditableMemberListField::class,
         ];
 
         $formFields = EditableFormField::get()
@@ -353,7 +360,7 @@ class UserDefinedFormControllerExtension extends Extension
         $groupTitle = '';
 
         foreach ($formFields as $formField) {
-            if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFormStep") {
+            if ($formField->ClassName == EditableFormStep::class) {
                 // Store title so when new step is encountered this title will be saved
                 // For first step do not add data just continue store title in currentTitle
                 if ($_fields == 0) {
@@ -379,7 +386,7 @@ class UserDefinedFormControllerExtension extends Extension
                 continue;
             }
 
-            if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroup") {
+            if ($formField->ClassName == EditableFieldGroup::class) {
                 // New group start detected - Store values of previous fields as ungrouped data
                 if ($fieldsList->Count()) {
                     $groupsList->add([
@@ -391,7 +398,7 @@ class UserDefinedFormControllerExtension extends Extension
                 $fieldsList = new ArrayList();
                 continue;
             }
-            if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFieldGroupEnd") {
+            if ($formField->ClassName == EditableFieldGroupEnd::class) {
                 $groupsList->add([
                     'FieldGroupTitle' => $groupTitle,
                     'FieldsList' => $fieldsList
@@ -404,7 +411,7 @@ class UserDefinedFormControllerExtension extends Extension
             $submission = $submittedData->where(['Name' => $formField->Name])->first();
 
             // Check if file is uploaded
-            if ($formField->ClassName == "SilverStripe\UserForms\Model\EditableFormField\EditableFileField") {
+            if ($formField->ClassName == EditableFileField::class) {
                 $fieldsList->add([
                     'FieldTitle' => $formField->Title ?? "Field Generic",
                     'FieldValue' => $submission->getFileName(),

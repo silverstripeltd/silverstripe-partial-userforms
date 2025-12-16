@@ -68,14 +68,14 @@ class UserDefinedFormExtension extends Extension
         // We need to manually add the tab
         $fields->addFieldToTab(
             'Root',
-            Tab::create('PartialSubmissions', _t(__CLASS__ . '.PartialSubmission', 'Partial submissions'))
+            Tab::create('PartialSubmissions', _t(self::class . '.PartialSubmission', 'Partial submissions'))
         );
 
         $fields->addFieldToTab(
             'Root.PartialSubmissions',
             GridField::create(
                 'PartialSubmissions',
-                _t(__CLASS__ . '.PartialSubmission', 'Partial submissions'),
+                _t(self::class . '.PartialSubmission', 'Partial submissions'),
                 $this->owner->PartialSubmissions()->sort('Created', 'DESC'),
                 $gridfieldConfig
             )
@@ -83,46 +83,46 @@ class UserDefinedFormExtension extends Extension
 
         $enablePartialCheckbox = CheckboxField::create(
             'EnablePartialSubmissions',
-            _t(__CLASS__ . '.enablePartialSubmissionsCheckboxLabel', 'Enable partial submissions')
+            _t(self::class . '.enablePartialSubmissionsCheckboxLabel', 'Enable partial submissions')
         )->setDescription(_t(
-            __CLASS__ . '.enablePartialSubmissionsDescription',
+            self::class . '.enablePartialSubmissionsDescription',
             'If checked, this will allow this form to be shareable and filled out by multiple people'
         ));
 
         $pwdCheckbox = CheckboxField::create(
             'PasswordProtected',
-            _t(__CLASS__ . 'PasswordProtected', 'Password protect resuming partial submissions')
+            _t(self::class . 'PasswordProtected', 'Password protect resuming partial submissions')
         )->setDescription(_t(
-            __CLASS__ . '.PasswordProtectDescription',
+            self::class . '.PasswordProtectDescription',
             'When resuming a partial submission, require the user to enter a password'
         ));
 
         $partialCheckbox = CheckboxField::create(
             'ExportPartialSubmissions',
-            _t(__CLASS__ . '.partialCheckboxLabel', 'Send partial submissions')
+            _t(self::class . '.partialCheckboxLabel', 'Send partial submissions')
         )->setDescription(_t(
-            __CLASS__ . '.partialCheckboxDescription',
+            self::class . '.partialCheckboxDescription',
             'The configuration and global export configuration can be set in the site Settings'
         ));
 
         $enableRecaptcha = CheckboxField::create(
             'EnableRecaptcha',
-            _t(__CLASS__ . '.enableRecaptchaLabel', 'Enable Invisible ReCAPTCHA')
+            _t(self::class . '.enableRecaptchaLabel', 'Enable Invisible ReCAPTCHA')
         )->setDescription(_t(
-            __CLASS__ . '.enableRecaptchaDescription',
+            self::class . '.enableRecaptchaDescription',
             'ReCAPTCHA will be triggered on File upload & Submit,Share or Save button click'
         ));
 
-        $introTextDescription = _t(__CLASS__ . '.introTextDescription', 'Text to display at the introduction page, before the user has started the form.');
-        $overviewTextDescription = _t(__CLASS__ . '.overviewTextDescription', 'Text to display on the overview page of the form, alongside form credentials.');
+        $introTextDescription = _t(self::class . '.introTextDescription', 'Text to display at the introduction page, before the user has started the form.');
+        $overviewTextDescription = _t(self::class . '.overviewTextDescription', 'Text to display on the overview page of the form, alongside form credentials.');
         $saveAndLogoutDescription = _t(
-            __CLASS__ . '.overviewSaveAndLogout',
+            self::class . '.overviewSaveAndLogout',
             'Text to display on the overview page of the form after Save and logout.'
         );
 
         $fields->addFieldToTab(
             'Root.FormOptions',
-            Tab::create('Partial', _t(__CLASS__ . '.partialTab', 'Partial'))
+            Tab::create('Partial', _t(self::class . '.partialTab', 'Partial'))
         );
         $fields->addFieldsToTab('Root.FormOptions.Partial', [
             $enablePartialCheckbox,

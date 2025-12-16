@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use Override;
 use Firesphere\PartialUserforms\Tasks\PartialSubmissionTask;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
@@ -68,6 +69,7 @@ class PartialSubmissionTaskTest extends SapphireTest
         $this->assertEmailSent('usernoconfig@example.com');
     }
 
+    #[Override]
     protected function setup(): void
     {
         parent::setup();

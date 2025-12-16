@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use Override;
 use Firesphere\PartialUserforms\Jobs\PartialSubmissionJob;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Control\Director;
@@ -179,6 +180,7 @@ class PartialSubmissionJobTest extends SapphireTest
         $this->assertEmailSent('test@example.com', 'site@' . Director::host());
     }
 
+    #[Override]
     protected function setup(): void
     {
         parent::setup();

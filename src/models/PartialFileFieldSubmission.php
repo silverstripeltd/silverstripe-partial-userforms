@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Models;
 
+use Override;
 use SilverStripe\Security\Member;
 use SilverStripe\UserForms\Model\Submission\SubmittedFileField;
 
@@ -24,6 +25,7 @@ class PartialFileFieldSubmission extends SubmittedFileField
      * @param array $context
      * @return boolean
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -34,6 +36,7 @@ class PartialFileFieldSubmission extends SubmittedFileField
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         if ($this->SubmittedFormID) {
@@ -48,6 +51,7 @@ class PartialFileFieldSubmission extends SubmittedFileField
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         if ($this->SubmittedFormID) {
@@ -62,6 +66,7 @@ class PartialFileFieldSubmission extends SubmittedFileField
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         if ($this->SubmittedFormID) {

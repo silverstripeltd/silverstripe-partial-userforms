@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use Override;
 use Firesphere\PartialUserforms\Extensions\SiteConfigExtension;
 use Firesphere\PartialUserforms\Jobs\PartialSubmissionJob;
 use SilverStripe\Core\Config\Config;
@@ -111,6 +112,7 @@ class SiteConfigExtensionTest extends SapphireTest
         $this->assertCount(1, $jobs);
     }
 
+    #[Override]
     protected function setup(): void
     {
         parent::setup();
@@ -122,6 +124,7 @@ class SiteConfigExtensionTest extends SapphireTest
         $this->extension = $extension;
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         /** DataList */

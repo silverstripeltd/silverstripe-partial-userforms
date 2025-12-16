@@ -2,6 +2,9 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use ReflectionClass;
+use ReflectionException;
+
 /**
  * A simple helper class for tests
  * @package Firesphere\PartialUserforms\Tests
@@ -15,15 +18,14 @@ class TestHelper
      * @param string $methodName
      * @param array $parameters
      * @return mixed
-     * @throws \ReflectionException
+     * @throws ReflectionException
      *
      * @link https://jtreminio.com/blog/unit-testing-tutorial-part-iii-testing-protected-private-methods-coverage-reports-and-crap/
      */
-    public static function invokeMethod(&$object, $methodName, array $parameters = array())
+    public static function invokeMethod(&$object, $methodName, array $parameters = [])
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new ReflectionClass($object::class);
         $method = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($object, $parameters);
     }

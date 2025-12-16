@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use Override;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\ORM\FieldType\DBDatetime;
@@ -72,7 +73,7 @@ class UserDefinedFormControllerExtensionTest extends FunctionalTest
     /**
      * Test overview page
      */
-    public function testOverview()
+    public function testOverview(): never
     {
         $this->markTestSkipped('Fix forTemplate error');
 
@@ -95,7 +96,7 @@ class UserDefinedFormControllerExtensionTest extends FunctionalTest
     /**
      * Test overview page with ongoing form session
      */
-    public function testOverviewLocked()
+    public function testOverviewLocked(): never
     {
         $this->markTestSkipped('Fix forTemplate error');
 
@@ -182,12 +183,14 @@ class UserDefinedFormControllerExtensionTest extends FunctionalTest
         $this->assertContains('form-1/Form', $response->getBody());
     }
 
+    #[Override]
     public function setup(): void
     {
         parent::setup();
         $this->objFromFixture(UserDefinedForm::class, 'form1')->publishRecursive();
     }
 
+    #[Override]
     public function tearDown(): void
     {
         if (session_id()) {

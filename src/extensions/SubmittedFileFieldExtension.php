@@ -3,7 +3,6 @@
 namespace Firesphere\PartialUserforms\Extensions;
 
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
-use SilverStripe\Control\Controller;
 use SilverStripe\Core\Extension;
 
 class SubmittedFileFieldExtension extends Extension

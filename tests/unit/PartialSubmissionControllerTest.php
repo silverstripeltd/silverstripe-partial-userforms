@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use Override;
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
 use Firesphere\PartialUserforms\Models\PartialFieldSubmission;
 use Firesphere\PartialUserforms\Models\PartialFileFieldSubmission;
@@ -152,7 +153,7 @@ class PartialSubmissionControllerTest extends FunctionalTest
 
         // With parent class
         $partialForm->ParentID = $formID;
-        $partialForm->ParentClass = get_class($form);
+        $partialForm->ParentClass = $form::class;
 
         $this->assertEquals(UserDefinedForm::class, $partialForm->ParentClass);
     }
@@ -249,6 +250,7 @@ class PartialSubmissionControllerTest extends FunctionalTest
         return $this->session()->get(PartialSubmissionController::SESSION_KEY);
     }
 
+    #[Override]
     public function setup(): void
     {
         parent::setup();
@@ -266,6 +268,7 @@ class PartialSubmissionControllerTest extends FunctionalTest
         $this->session()->set(PartialSubmissionController::SESSION_KEY, $partialID);
     }
 
+    #[Override]
     public function tearDown(): void
     {
         if (session_id()) {

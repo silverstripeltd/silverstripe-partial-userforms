@@ -74,7 +74,7 @@ class PartialUserFormVerifyController extends PageController
         $partial = $this->getPartialFormSubmission();
         $request = $this->getRequest();
 
-        $password = hash_pbkdf2('SHA256', $data['Password'], (string) $partial->TokenSalt, 1000);
+        $password = hash_pbkdf2('SHA256', (string) $data['Password'], (string) $partial->TokenSalt, 1000);
         if (!hash_equals($password, $partial->Password)) {
             $form->sessionError(
                 _t(

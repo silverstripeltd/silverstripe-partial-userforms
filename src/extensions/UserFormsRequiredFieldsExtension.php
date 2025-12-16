@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Extensions;
 
+use Override;
 use InvalidArgumentException;
 use SilverStripe\Forms\FormField;
 use SilverStripe\UserForms\Model\EditableFormField;
@@ -27,13 +28,14 @@ class UserFormsRequiredFieldsExtension extends UserFormsRequiredFieldsValidator
      *
      * @return bool
      */
+    #[Override]
     public function php($data)
     {
         $valid = true;
         $fields = $this->form->Fields();
 
         foreach ($fields as $field) {
-            $valid = ($field->validate($this) && $valid);
+            $valid = ($field->validate() && $valid);
         }
 
         if (empty($this->required)) {
@@ -104,7 +106,7 @@ class UserFormsRequiredFieldsExtension extends UserFormsRequiredFieldsValidator
         $error = false;
         $fieldName = $field->getName();
         // submitted data for file upload fields come back as an array
-        $value = isset($data[$fieldName]) ? $data[$fieldName] : null;
+        $value = $data[$fieldName] ?? null;
 
         if (is_array($value)) {
             $error = (count($value ?? [])) ? false : true;
@@ -129,7 +131,7 @@ class UserFormsRequiredFieldsExtension extends UserFormsRequiredFieldsValidator
             '{name} is required',
             [
                 'name' => strip_tags(
-                    '"' . ($formField->Title() ? $formField->Title() : $fieldName) . '"'
+                    '"' . ($formField->Title() ?: $fieldName) . '"'
                 )
             ]
         );

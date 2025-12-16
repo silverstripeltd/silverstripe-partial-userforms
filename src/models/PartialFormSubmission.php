@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Models;
 
+use Override;
 use Exception;
 use Firesphere\PartialUserforms\Controllers\PartialUserFormVerifyController;
 use Firesphere\PartialUserforms\Models\EditableRepeatField;
@@ -118,6 +119,7 @@ class PartialFormSubmission extends SubmittedForm
      * @return FieldList
      * @throws Exception
      */
+    #[Override]
     public function getCMSFields()
     {
         /** @var FieldList $fields */
@@ -155,7 +157,7 @@ class PartialFormSubmission extends SubmittedForm
             }
             if ($editable->ClassName === EditableRepeatField::class) {
                 $submissions = [];
-                $repeatValues = $partial->Value ? array_filter(explode(',', $partial->Value)) : [];
+                $repeatValues = $partial->Value ? array_filter(explode(',', (string) $partial->Value)) : [];
                 array_unshift($repeatValues, 0);
 
                 for($index = 0; $index <= $editable->Maximum; $index++) {
@@ -254,6 +256,7 @@ class PartialFormSubmission extends SubmittedForm
      * If the submission is password protected, generate a password.
      * @throws Exception
      */
+    #[Override]
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -292,7 +295,7 @@ class PartialFormSubmission extends SubmittedForm
         $chars = array_merge($chars, range(0, 9));
         $chars = array_merge($chars, self::$special_characters);
         shuffle($chars);
-        $pwd = implode(array_slice($chars, 0, 10));
+        $pwd = implode('', array_slice($chars, 0, 10));
         Controller::curr()->getRequest()->getSession()->set(PartialUserFormVerifyController::PASSWORD_KEY, $pwd);
 
         return hash_pbkdf2('SHA256', $pwd, (string)$this->TokenSalt, 1000);
@@ -312,6 +315,7 @@ class PartialFormSubmission extends SubmittedForm
      * @return bool|string|null
      * @throws Exception
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -322,6 +326,7 @@ class PartialFormSubmission extends SubmittedForm
      *
      * @return boolean|string
      */
+    #[Override]
     public function canView($member = null)
     {
         if ($this->UserDefinedFormID) {
@@ -337,6 +342,7 @@ class PartialFormSubmission extends SubmittedForm
      * @throws Exception
      * @return boolean|string
      */
+    #[Override]
     public function canEdit($member = null)
     {
         if ($this->UserDefinedFormID) {
@@ -351,6 +357,7 @@ class PartialFormSubmission extends SubmittedForm
      *
      * @return boolean|string
      */
+    #[Override]
     public function canDelete($member = null)
     {
         if ($this->UserDefinedFormID) {

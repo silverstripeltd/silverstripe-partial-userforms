@@ -2,6 +2,9 @@
 
 namespace Firesphere\PartialUserforms\Controllers;
 
+use SilverStripe\UserForms\Model\EditableFormField\EditableFileField;
+use DateTime;
+use DateInterval;
 use Exception;
 use Firesphere\PartialUserforms\Models\PartialFieldSubmission;
 use Firesphere\PartialUserforms\Models\PartialFileFieldSubmission;
@@ -77,7 +80,7 @@ class PartialSubmissionController extends ContentController
                 'Value'           => $value,
                 'SubmittedFormID' => $submissionID
             ]);
-            if ($editableField instanceof EditableFormField\EditableFileField) {
+            if ($editableField instanceof EditableFileField) {
                 $editableFiles['Names'][] = $field;
             }
         }
@@ -163,8 +166,8 @@ class PartialSubmissionController extends ContentController
         $session->set(self::SESSION_KEY, $partial->ID);
         $session->set(self::SESSION_KEY . '_HasFormSaved', false);
 
-        $now = new \DateTime(DBDatetime::now()->getValue());
-        $now->add(new \DateInterval('PT30M'));
+        $now = new DateTime(DBDatetime::now()->getValue());
+        $now->add(new DateInterval('PT30M'));
 
         $phpSessionID = session_id();
         if (!$phpSessionID) {
@@ -238,10 +241,10 @@ class PartialSubmissionController extends ContentController
         /** @var EditableFormField $editableField */
         $editableField = EditableFormField::get()->find('Name', $formData['Name']);
         if (is_null($editableField)) {
-            $nameParts = explode('__', $formData['Name']);
+            $nameParts = explode('__', (string) $formData['Name']);
             $editableField = EditableFormField::get()->find('Name', reset($nameParts));
         }
-        if ($editableField instanceof EditableFormField\EditableFileField) {
+        if ($editableField instanceof EditableFileField) {
             $this->savePartialFile($formData, $filter, $editableField);
         } elseif ($editableField instanceof EditableFormField) {
             $this->savePartialField($formData, $filter, $editableField);
@@ -281,7 +284,7 @@ class PartialSubmissionController extends ContentController
      * @throws ValidationException
      * @throws Exception
      */
-    protected function savePartialFile($formData, array $filter, EditableFormField\EditableFileField $editableField)
+    protected function savePartialFile($formData, array $filter, EditableFileField $editableField)
     {
         $partialFileSubmission = PartialFileFieldSubmission::get()->filter($filter)->first();
         if (!$partialFileSubmission && $editableField) {

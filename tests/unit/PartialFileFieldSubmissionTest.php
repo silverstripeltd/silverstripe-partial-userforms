@@ -2,6 +2,7 @@
 
 namespace Firesphere\PartialUserforms\Tests;
 
+use Override;
 use Firesphere\PartialUserforms\Models\PartialFileFieldSubmission;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Dev\SapphireTest;
@@ -61,6 +62,7 @@ class PartialFileFieldSubmissionTest extends SapphireTest
         $this->assertTrue($this->field->canDelete($member));
     }
 
+    #[Override]
     protected function setup(): void
     {
         parent::setup();
