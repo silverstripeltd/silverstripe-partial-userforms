@@ -5,6 +5,7 @@ namespace Firesphere\PartialUserforms\Extensions;
 use Firesphere\PartialUserforms\Controllers\PartialSubmissionController;
 use Firesphere\PartialUserforms\Models\PartialFormSubmission;
 use SilverStripe\Admin\AdminRootController;
+use SilverStripe\Control\Director;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
 
@@ -12,7 +13,7 @@ class EditableFileFieldExtension extends DataExtension
 {
     public function afterUpdateFormField($field)
     {
-        if (!Controller::has_curr()) {
+        if (!Controller::has_curr() || Director::is_cli()) {
             return $field;
         }
 
