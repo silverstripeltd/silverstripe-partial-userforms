@@ -61,7 +61,7 @@ class PartialFileFieldSubmissionTest extends SapphireTest
         $this->assertTrue($this->field->canDelete($member));
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $udf = UserDefinedForm::create(['Title' => 'Test']);

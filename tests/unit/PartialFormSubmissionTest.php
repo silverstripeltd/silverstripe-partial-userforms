@@ -152,7 +152,7 @@ class PartialFormSubmissionTest extends SapphireTest
         $this->assertEquals($pwd, $this->submission->Password);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

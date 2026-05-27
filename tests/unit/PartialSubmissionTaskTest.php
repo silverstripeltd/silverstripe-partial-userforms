@@ -68,7 +68,7 @@ class PartialSubmissionTaskTest extends SapphireTest
         $this->assertEmailSent('usernoconfig@example.com');
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         Config::modify()->set(QueuedJobService::class, 'use_shutdown_function', false);
