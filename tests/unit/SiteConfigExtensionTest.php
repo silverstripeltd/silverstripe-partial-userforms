@@ -111,7 +111,7 @@ class SiteConfigExtensionTest extends SapphireTest
         $this->assertCount(1, $jobs);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
