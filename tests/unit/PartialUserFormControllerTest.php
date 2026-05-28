@@ -164,7 +164,7 @@ class PartialUserFormControllerTest extends FunctionalTest
         $this->assertContains('/client/dist/main.js', $response->getBody());
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->objFromFixture(UserDefinedForm::class, 'form1')->publishRecursive();
