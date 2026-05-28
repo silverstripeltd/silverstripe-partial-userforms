@@ -249,7 +249,7 @@ class PartialSubmissionControllerTest extends FunctionalTest
         return $this->session()->get(PartialSubmissionController::SESSION_KEY);
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $udf = $this->objFromFixture(UserDefinedForm::class, 'form1');

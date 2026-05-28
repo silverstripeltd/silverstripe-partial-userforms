@@ -182,7 +182,7 @@ class UserDefinedFormControllerExtensionTest extends FunctionalTest
         $this->assertContains('form-1/Form', $response->getBody());
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->objFromFixture(UserDefinedForm::class, 'form1')->publishRecursive();
