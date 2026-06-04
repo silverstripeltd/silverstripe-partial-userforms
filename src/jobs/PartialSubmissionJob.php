@@ -47,7 +47,7 @@ class PartialSubmissionJob extends AbstractQueuedJob
     /**
      * Prepare the data
      */
-    protected function setUp(): void
+    public function setUp()
     {
         parent::setup();
         $this->config = SiteConfig::current_site_config();
